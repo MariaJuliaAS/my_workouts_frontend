@@ -7,7 +7,7 @@ export function MainLayout() {
         <div className="w-full bg-black h-screen flex flex-col items-center">
             <Header />
 
-            <main className="max-w-2xl bg-amber-100 w-full flex-1">
+            <main className="max-w-2xl w-full flex-1">
                 <Outlet />
             </main>
 
