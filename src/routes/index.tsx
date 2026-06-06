@@ -3,6 +3,7 @@ import { MainLayout } from "../layouts/MainLayout";
 import { Home } from "../pages/home";
 import { Workout } from "../pages/workout";
 import { PRs } from "../pages/pr";
+import { NewWorkout } from "../pages/new_workout";
 
 
 export const router = createBrowserRouter([
@@ -12,7 +13,8 @@ export const router = createBrowserRouter([
             { index: true, element: <Home /> },
             { path: "treinos", element: <Workout /> },
             { path: "prs", element: <PRs /> },
+            { path: "treino/novo", element: <NewWorkout /> },
             { path: "*", element: <div className="p-4">Página não encontrada</div> }
         ]
-    }
+    },
 ])

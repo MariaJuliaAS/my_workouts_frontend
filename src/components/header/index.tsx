@@ -1,4 +1,5 @@
 import { FaPlus } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 export function Header() {
     return (
@@ -8,9 +9,9 @@ export function Header() {
                     <p className="font-bold text-2xl">Treinos</p>
                     <span className="text-gray-400">Gerencie seus treinos</span>
                 </div>
-                <button className="bg-amber-600 sm:h-12 sm:w-12 h-10 w-10 flex justify-center items-center rounded-full text-black cursor-pointer font-semibold transition-all duration-200 shadow-lg shadow-amber-600/40 hover:bg-amber-500 hover:scale-105">
+                <Link to="/treino/novo" className="bg-amber-600 sm:h-12 sm:w-12 h-10 w-10 flex justify-center items-center rounded-full text-black cursor-pointer font-semibold transition-all duration-200 shadow-lg shadow-amber-600/40 hover:bg-amber-500 hover:scale-105">
                     <FaPlus className="sm:text-xl text-lg" />
-                </button>
+                </Link>
             </nav>
         </div>
     )
