@@ -10,7 +10,7 @@ function itemClass(isActive: boolean) {
 export function Nav() {
     return (
         <div className="w-full h-22 border-t border-gray-800/60">
-            <nav className="w-full h-22 bg-black/50 text-white max-w-2xl mx-auto flex items-center justify-between sm:px-0 px-10" >
+            <nav className="w-full h-22 bg-neutral-950/70 text-white max-w-2xl mx-auto flex items-center justify-between sm:px-0 px-10" >
                 <NavLink to="/" className={({ isActive }) => itemClass(isActive)}>
                     <LuDumbbell size={24} className="" />
                     <p className="text-sm font-medium">Treinos</p>
