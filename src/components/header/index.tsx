@@ -1,8 +1,9 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { FiUser } from "react-icons/fi";
 import { IoLogOutOutline } from "react-icons/io5";
+import { getUser } from "../../util/getUser";
 
 interface HeaderAction {
     to: string;
@@ -19,6 +20,8 @@ interface HeaderProps {
 export function Header({ title, subtitle, action }: HeaderProps) {
     const [menuOpen, setMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
+    const user = getUser();
+    const navigate = useNavigate();
 
     useEffect(() => {
         function handleClickOutside(e: MouseEvent) {
@@ -29,6 +32,12 @@ export function Header({ title, subtitle, action }: HeaderProps) {
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
+
+    function handleLogout() {
+        localStorage.removeItem("token_my_workouts");
+        setMenuOpen(false);
+        navigate("/login");
+    }
 
     return (
         <div className="w-full h-22 border-b border-gray-800/60">
@@ -55,7 +64,7 @@ export function Header({ title, subtitle, action }: HeaderProps) {
                             onClick={() => setMenuOpen(prev => !prev)}
                             className="bg-amber-600/30 sm:h-12 sm:w-12 h-10 w-10 flex justify-center items-center rounded-full cursor-pointer font-semibold transition-all duration-200 text-lg text-amber-400 hover:bg-amber-600/50"
                         >
-                            J
+                            {user?.name.charAt(0)}
                         </button>
 
                         {menuOpen && (
@@ -66,10 +75,10 @@ export function Header({ title, subtitle, action }: HeaderProps) {
                                     </div>
                                     <div className="flex flex-col min-w-0">
                                         <span className="text-white font-semibold text-sm truncate">
-                                            julia
+                                            {user?.name}
                                         </span>
                                         <span className="text-gray-400 text-xs truncate">
-                                            julia@teste.com
+                                            {user?.username}
                                         </span>
                                     </div>
                                 </div>
@@ -77,7 +86,7 @@ export function Header({ title, subtitle, action }: HeaderProps) {
                                 <hr className="border-gray-700/60 my-1" />
 
                                 <button
-                                    onClick={() => setMenuOpen(false)}
+                                    onClick={handleLogout}
                                     className="flex items-center gap-3 px-2 py-2 rounded-xl text-red-400 hover:bg-red-500/10 transition-colors duration-150 cursor-pointer w-full text-left"
                                 >
                                     <IoLogOutOutline size={18} />
