@@ -136,7 +136,7 @@ export function NewWorkout() {
                                                 <div className="flex flex-col gap-1">
                                                     <span className="text-xs text-gray-500">Séries</span>
                                                     <input
-                                                        type="text"
+                                                        type="number"
                                                         value={ex.sets}
                                                         onChange={e => updateExercise(ex.id, "sets", e.target.value)}
                                                         className="bg-neutral-950/70 border border-gray-800/50 rounded-lg px-3 py-2 text-sm text-center focus:outline-none focus:border-gray-600"
@@ -145,7 +145,7 @@ export function NewWorkout() {
                                                 <div className="flex flex-col gap-1">
                                                     <span className="text-xs text-gray-500">Repetições</span>
                                                     <input
-                                                        type="text"
+                                                        type="number"
                                                         value={ex.reps}
                                                         onChange={e => updateExercise(ex.id, "reps", e.target.value)}
                                                         className="bg-neutral-950/70 border border-gray-800/50 rounded-lg px-3 py-2 text-sm text-center focus:outline-none focus:border-gray-600"
