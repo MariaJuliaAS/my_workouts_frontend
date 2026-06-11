@@ -1,7 +1,8 @@
 import { useState } from "react"
 import { FaArrowLeftLong } from "react-icons/fa6"
 import { FiPlus, FiTrash2 } from "react-icons/fi"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+import { api } from "../../api/api"
 
 interface Exercise {
     id: number
@@ -13,14 +14,15 @@ interface Exercise {
 
 export function NewWorkout() {
     const [exercises, setExercises] = useState<Exercise[]>([])
-    const [counter, setCounter] = useState(1)
+    const [workoutName, setWorkoutName] = useState("")
+    const [loading, setLoading] = useState(false)
+    const navigate = useNavigate()
 
     function addExercise() {
         setExercises(prev => [
             ...prev,
-            { id: Date.now(), name: "", sets: "3", reps: "10-12", notes: "" }
+            { id: Date.now(), name: "", sets: "3", reps: "10", notes: "" }
         ])
-        setCounter(c => c + 1)
     }
 
     function removeExercise(id: number) {
@@ -31,6 +33,37 @@ export function NewWorkout() {
         setExercises(prev =>
             prev.map(ex => ex.id === id ? { ...ex, [field]: value } : ex)
         )
+    }
+
+    async function handleSave() {
+        if (!workoutName.trim()) {
+            alert("Informe o nome do treino")
+            return
+        }
+
+        try {
+            setLoading(true)
+            await api.post("/workout", {
+                name: workoutName,
+                exercises: exercises.map(ex => ({
+                    name: ex.name,
+                    sets: Number(ex.sets),
+                    reps: Number(ex.reps),
+                    notes: ex.notes || ""
+                }))
+            },
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token_my_workouts")}`
+                    }
+                })
+            navigate("/")
+        } catch (err: any) {
+            alert("Erro ao salvar treino")
+            console.error(err.response?.data)
+        } finally {
+            setLoading(false)
+        }
     }
 
     return (
@@ -50,6 +83,8 @@ export function NewWorkout() {
                             <label className="font-medium">Nome do Treino</label>
                             <input
                                 type="text"
+                                value={workoutName}
+                                onChange={e => setWorkoutName(e.target.value)}
                                 className="mt-2 w-full bg-neutral-950/70 border border-gray-800/60 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:border-transparent"
                                 placeholder="Ex: Upper 1, Push, Perna A..."
                             />
@@ -61,7 +96,7 @@ export function NewWorkout() {
                                 <button
                                     type="button"
                                     onClick={addExercise}
-                                    className="cursor-pointer flex items-center gap-1.5 bg-gray-700 hover:bg- transition-colors duration-200 rounded-full px-4 py-2 text-sm font-medium"
+                                    className="cursor-pointer flex items-center gap-1.5 bg-gray-700 hover:bg-gray-600 transition-colors duration-200 rounded-full px-4 py-2 text-sm font-medium"
                                 >
                                     <FiPlus size={14} />
                                     Adicionar
@@ -113,7 +148,7 @@ export function NewWorkout() {
                                                         type="text"
                                                         value={ex.reps}
                                                         onChange={e => updateExercise(ex.id, "reps", e.target.value)}
-                                                        className=" bg-neutral-950/70 border border-gray-800/50 rounded-lg px-3 py-2 text-sm text-center focus:outline-none focus:border-gray-600"
+                                                        className="bg-neutral-950/70 border border-gray-800/50 rounded-lg px-3 py-2 text-sm text-center focus:outline-none focus:border-gray-600"
                                                     />
                                                 </div>
                                             </div>
@@ -135,9 +170,11 @@ export function NewWorkout() {
 
                         <button
                             type="button"
-                            className="w-full bg-amber-600 transition-all duration-200 shadow-lg shadow-amber-600/40 hover:bg-amber-500 hover:scale-105 text-black font-bold text-lg rounded-2xl py-2 cursor-pointer"
+                            onClick={handleSave}
+                            disabled={loading}
+                            className="w-full bg-amber-600 transition-all duration-200 shadow-lg shadow-amber-600/40 hover:bg-amber-500 hover:scale-105 text-black font-bold text-lg rounded-2xl py-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
                         >
-                            Salvar Treino
+                            {loading ? "Salvando..." : "Salvar Treino"}
                         </button>
 
                     </div>
