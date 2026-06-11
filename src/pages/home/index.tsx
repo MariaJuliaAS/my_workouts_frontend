@@ -1,22 +1,51 @@
+import { useEffect, useState } from "react";
 import { LuDumbbell, LuPencil, LuTrash } from "react-icons/lu";
 import { RiArrowRightSLine } from "react-icons/ri";
 import { NavLink } from "react-router-dom";
+import { api } from "../../api/api";
 
+interface WorkoutProps {
+    id: string;
+    name: string;
+    user_id: string;
+    exercises?: Exercise[];
+}
+
+interface Exercise {
+    id: number
+    name: string
+    sets: string
+    reps: string
+    notes: string
+}
 
 export function Home() {
-    const treino: { nome: string; tam: number }[] = [];
+    const [workoutList, setWorkoutList] = useState<WorkoutProps[]>([])
+
+    async function fetchWorkouts() {
+        try {
+            const res = await api.get("/workout")
+            setWorkoutList(res.data);
+        } catch (err: any) {
+            console.error(err.response?.data)
+        }
+    }
+
+    useEffect(() => {
+        fetchWorkouts();
+    }, [])
 
     return (
         <div className="h-full w-full  sm:px-0 px-10 py-5">
-            {treino.length > 0 && (
+            {workoutList.length > 0 && (
                 <header className="text-white flex flex-row justify-between mb-8">
                     <p className="font-medium text-lg sm:text-xl">Meus treinos</p>
-                    <span className="text-gray-400">{treino.length} treinos</span>
+                    <span className="text-gray-400">{workoutList.length} treinos</span>
                 </header>
             )}
 
             <main className="w-full text-white flex justify-center h-full">
-                {treino.length === 0 ? (
+                {workoutList.length === 0 ? (
                     <div className="flex items-center justify-center flex-col">
                         <LuDumbbell size={58} className="text-gray-400 mb-4" />
                         <p className="font-medium text-lg sm:text-xl">Nenhum treino ainda</p>
@@ -28,15 +57,15 @@ export function Home() {
                     </div>
                 ) : (
                     <div className="flex items-center flex-col w-full overflow-y-auto gap-4">
-                        {treino.map((t) => (
-                            <div className="w-full bg-neutral-950/70 border hover:border-amber-600/40 border-gray-800/60 cursor-pointer rounded-lg flex items-center justify-between px-4 py-3 group">
+                        {workoutList.map((workout) => (
+                            <div className="w-full bg-neutral-950/70 border hover:border-amber-600/40 border-gray-800/60 cursor-pointer rounded-xl flex items-center justify-between px-4 py-3 group">
                                 <div className="flex items-center justify-center gap-4">
                                     <div className="text-amber-600 bg-amber-600/30 flex items-center justify-center h-12 w-12 rounded-xl">
                                         <LuDumbbell size={24} />
                                     </div>
                                     <div>
-                                        <p className="font-medium text-lg">{t.nome}</p>
-                                        <span className="text-gray-400">{t.tam} Exercícios</span>
+                                        <p className="font-medium text-lg">{workout.name}</p>
+                                        <span className="text-gray-400">{workout.exercises?.length || 0} Exercícios</span>
                                     </div>
                                 </div>
                                 <div className="flex items-center">

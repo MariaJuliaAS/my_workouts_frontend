@@ -57,6 +57,7 @@ export function NewWorkout() {
                         Authorization: `Bearer ${localStorage.getItem("token_my_workouts")}`
                     }
                 })
+            alert("Treino salvo com sucesso!")
             navigate("/")
         } catch (err: any) {
             alert("Erro ao salvar treino")
