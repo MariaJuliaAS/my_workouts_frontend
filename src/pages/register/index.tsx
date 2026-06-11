@@ -1,11 +1,16 @@
 import { useState } from "react";
 import { LuDumbbell } from "react-icons/lu";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Navigate, NavLink, useNavigate } from "react-router-dom";
 import { api } from "../../api/api";
 
 export function Register() {
     const [form, setForm] = useState({ name: "", username: "", password: "" });
     const navigate = useNavigate();
+
+    const token = localStorage.getItem("token_my_workouts");
+    if (token) {
+        return <Navigate to="/" />
+    }
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();

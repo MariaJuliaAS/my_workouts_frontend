@@ -6,6 +6,7 @@ import { PRs } from "../pages/pr";
 import { NewWorkout } from "../pages/new_workout";
 import { Login } from "../pages/login";
 import { Register } from "../pages/register";
+import { PrivateRoutes } from "./privateRoutes";
 
 
 export const router = createBrowserRouter([
@@ -20,11 +21,32 @@ export const router = createBrowserRouter([
     {
         element: <MainLayout />,
         children: [
-            { index: true, element: <Home /> },
-            { path: "treinos", element: <Workout /> },
-            { path: "prs", element: <PRs /> },
-            { path: "treino/novo", element: <NewWorkout /> },
-            { path: "*", element: <div className="p-4">Página não encontrada</div> }
+            {
+                path: "/", element:
+                    <PrivateRoutes>
+                        <Home />
+                    </PrivateRoutes>
+            },
+            {
+                path: "treinos", element:
+                    <PrivateRoutes>
+                        <Workout />
+                    </PrivateRoutes>
+            },
+            {
+                path: "prs", element:
+                    <PrivateRoutes>
+                        <PRs />
+                    </PrivateRoutes>
+            },
+            {
+                path: "treino/novo", element:
+
+                    <PrivateRoutes>
+                        <NewWorkout />
+                    </PrivateRoutes>
+            },
+            { path: "*", element: <div className="p-4 text-white flex items-center justify-center font-bold text-xl">Página não encontrada</div> }
         ]
     },
 ])
