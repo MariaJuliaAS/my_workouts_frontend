@@ -1,13 +1,27 @@
 import { useState } from "react";
 import { LuDumbbell } from "react-icons/lu";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { api } from "../../api/api";
 
 export function Register() {
-    const [form, setForm] = useState({ nome: "", username: "", password: "" });
+    const [form, setForm] = useState({ name: "", username: "", password: "" });
+    const navigate = useNavigate();
 
-    function handleSubmit(e: React.FormEvent) {
+    async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        console.log(form);
+        try {
+            if (!form.name || !form.username || !form.password) {
+                alert("Preencha todos os campos")
+                return;
+            }
+
+            await api.post("/user", form)
+            alert("Conta criada com sucesso!")
+            navigate("/login");
+        } catch (err: any) {
+            alert("Erro ao criar conta")
+            console.error(err);
+        }
     }
 
     return (
@@ -30,8 +44,8 @@ export function Register() {
                         <input
                             type="text"
                             placeholder="Seu nome"
-                            value={form.nome}
-                            onChange={e => setForm(prev => ({ ...prev, nome: e.target.value }))}
+                            value={form.name}
+                            onChange={e => setForm(prev => ({ ...prev, name: e.target.value }))}
                             className="bg-neutral-950/70 border border-gray-800/60 focus:border-amber-600/60 text-white rounded-lg px-4 h-11 outline-none transition-colors duration-200 placeholder:text-gray-600"
                         />
                     </div>

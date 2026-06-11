@@ -1,13 +1,33 @@
 import { useState } from "react";
 import { LuDumbbell } from "react-icons/lu";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { api } from "../../api/api";
 
 export function Login() {
     const [form, setForm] = useState({ username: "", password: "" });
+    const navigate = useNavigate();
 
-    function handleSubmit(e: React.FormEvent) {
+    async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        console.log(form);
+
+        try {
+
+            if (!form.username || !form.password) {
+                alert("Preencha todos os campos")
+                return;
+            }
+
+            const response = await api.post("/user/auth", form);
+            alert("Login realizado com sucesso!")
+
+            localStorage.setItem("token_my_workouts", response.data.token);
+
+            navigate("/");
+
+        } catch (err: any) {
+            alert("Erro ao fazer login")
+            console.error(err);
+        }
     }
 
     return (
