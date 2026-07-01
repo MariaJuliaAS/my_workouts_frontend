@@ -4,6 +4,7 @@ import { Home } from "../pages/home";
 import { Workout } from "../pages/workout";
 import { PRs } from "../pages/pr";
 import { NewWorkout } from "../pages/new_workout";
+import { EditWorkout } from "../pages/edit_workout";
 import { Login } from "../pages/login";
 import { Register } from "../pages/register";
 import { PrivateRoutes } from "./privateRoutes";
@@ -44,6 +45,13 @@ export const router = createBrowserRouter([
 
                     <PrivateRoutes>
                         <NewWorkout />
+                    </PrivateRoutes>
+            },
+            {
+                path: "treino/editar/:id", element:
+
+                    <PrivateRoutes>
+                        <EditWorkout />
                     </PrivateRoutes>
             },
             { path: "*", element: <div className="p-4 text-white flex items-center justify-center font-bold text-xl">Página não encontrada</div> }

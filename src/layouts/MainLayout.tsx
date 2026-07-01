@@ -41,7 +41,7 @@ export function MainLayout() {
     }
 
     return (
-        <div className="w-full bg-black h-screen flex flex-col items-center">
+        <div className="w-full bg-black min-h-screen flex flex-col items-center">
             {renderHeader()}
 
             <main className="max-w-2xl w-full flex-1">

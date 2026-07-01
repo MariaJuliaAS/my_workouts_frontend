@@ -1,8 +1,5 @@
 import { NavLink } from "react-router-dom";
 
-
-
-
 export function Workout() {
     const treinos: { nome: string; tam: number }[] = [];
 

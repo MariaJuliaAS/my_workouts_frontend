@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { LuDumbbell, LuPencil, LuTrash } from "react-icons/lu";
 import { RiArrowRightSLine } from "react-icons/ri";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { api } from "../../api/api";
 
 interface WorkoutProps {
@@ -21,6 +21,7 @@ interface Exercise {
 
 export function Home() {
     const [workoutList, setWorkoutList] = useState<WorkoutProps[]>([])
+    const navigate = useNavigate()
 
     async function fetchWorkouts() {
         try {
@@ -35,12 +36,24 @@ export function Home() {
         fetchWorkouts();
     }, [])
 
+    async function handleDeleteWorkout(workoutId: string) {
+        console.log("Deleting workout with ID:", workoutId);
+        try {
+            await api.delete(`/workout/${workoutId}`);
+            setWorkoutList(prevWorkouts => prevWorkouts.filter(workout => workout.id !== workoutId));
+            alert("Treino deletado com sucesso!");
+        } catch (err: any) {
+            console.error(err.response?.data)
+            alert("Erro ao deletar treino. Por favor, tente novamente.");
+        }
+    }
+
     return (
         <div className="h-full w-full  sm:px-0 px-10 py-5">
             {workoutList.length > 0 && (
                 <header className="text-white flex flex-row justify-between mb-8">
                     <p className="font-medium text-lg sm:text-xl">Meus treinos</p>
-                    <span className="text-gray-400">{workoutList.length} treinos</span>
+                    <span className="text-gray-400">{workoutList.length} treino(s)</span>
                 </header>
             )}
 
@@ -58,7 +71,7 @@ export function Home() {
                 ) : (
                     <div className="flex items-center flex-col w-full overflow-y-auto gap-4">
                         {workoutList.map((workout) => (
-                            <div className="w-full bg-neutral-950/70 border hover:border-amber-600/40 border-gray-800/60 cursor-pointer rounded-xl flex items-center justify-between px-4 py-3 group">
+                            <div key={workout.id} className="w-full bg-neutral-950/70 border hover:border-amber-600/40 border-gray-800/60 cursor-pointer rounded-xl flex items-center justify-between px-4 py-3 group">
                                 <div className="flex items-center justify-center gap-4">
                                     <div className="text-amber-600 bg-amber-600/30 flex items-center justify-center h-12 w-12 rounded-xl">
                                         <LuDumbbell size={24} />
@@ -73,10 +86,14 @@ export function Home() {
                                         <RiArrowRightSLine size={24} />
                                     </button>
                                     <div className="hidden items-center gap-2 group-hover:flex">
-                                        <button className="cursor-pointer transition-all duration-200 hover:scale-105 p-2">
+                                        <button 
+                                            onClick={() => navigate(`/treino/editar/${workout.id}`)}
+                                            className="cursor-pointer transition-all duration-200 hover:scale-105 p-2">
                                             <LuPencil size={20} className="text-gray-400" />
                                         </button>
-                                        <button className="cursor-pointer transition-all duration-200 hover:scale-105 p-2">
+                                        <button
+                                            onClick={() => handleDeleteWorkout(workout.id)}
+                                            className="cursor-pointer transition-all duration-200 hover:scale-105 p-2">
                                             <LuTrash size={20} className="text-gray-400" />
                                         </button>
                                     </div>
