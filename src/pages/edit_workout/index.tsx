@@ -102,7 +102,6 @@ export function EditWorkout() {
                         reps: Number(ex.reps),
                         notes: ex.notes || ""
                     }
-                    // Only include id if it's a string (existing exercise from DB)
                     if (typeof ex.id === 'string') {
                         exercise.id = ex.id
                     }

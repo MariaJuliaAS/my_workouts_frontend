@@ -4,7 +4,7 @@ import { RiArrowRightSLine } from "react-icons/ri";
 import { NavLink, useNavigate } from "react-router-dom";
 import { api } from "../../api/api";
 
-interface WorkoutProps {
+export interface WorkoutProps {
     id: string;
     name: string;
     user_id: string;

@@ -1,7 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import { MainLayout } from "../layouts/MainLayout";
 import { Home } from "../pages/home";
-import { Workout } from "../pages/workout";
 import { WorkoutDetail } from "../pages/workout_detail";
 import { PRs } from "../pages/pr";
 import { NewWorkout } from "../pages/new_workout";
@@ -9,6 +8,7 @@ import { EditWorkout } from "../pages/edit_workout";
 import { Login } from "../pages/login";
 import { Register } from "../pages/register";
 import { PrivateRoutes } from "./privateRoutes";
+import { Run } from "../pages/run";
 
 
 export const router = createBrowserRouter([
@@ -30,9 +30,9 @@ export const router = createBrowserRouter([
                     </PrivateRoutes>
             },
             {
-                path: "treinos", element:
+                path: "corrida", element:
                     <PrivateRoutes>
-                        <Workout />
+                        <Run />
                     </PrivateRoutes>
             },
             {

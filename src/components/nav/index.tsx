@@ -1,5 +1,5 @@
+import { BiRun } from "react-icons/bi";
 import { GoTrophy } from "react-icons/go";
-import { LuClipboardList } from "react-icons/lu";
 import { LuDumbbell } from "react-icons/lu";
 import { NavLink } from "react-router-dom";
 
@@ -15,9 +15,9 @@ export function Nav() {
                     <LuDumbbell size={24} className="" />
                     <p className="text-sm font-medium">Treinos</p>
                 </NavLink>
-                <NavLink to="/treinos" className={({ isActive }) => itemClass(isActive)}>
-                    <LuClipboardList size={24} className="" />
-                    <p className="text-sm font-medium">Treinar</p>
+                <NavLink to="/corrida" className={({ isActive }) => itemClass(isActive)}>
+                    <BiRun size={24} className="" />
+                    <p className="text-sm font-medium">Corrida</p>
                 </NavLink>
                 <NavLink to="/prs" className={({ isActive }) => itemClass(isActive)}>
                     <GoTrophy size={24} className="" />
