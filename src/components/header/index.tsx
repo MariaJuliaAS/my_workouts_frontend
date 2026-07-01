@@ -43,8 +43,8 @@ export function Header({ title, subtitle, action }: HeaderProps) {
         <div className="w-full h-22 border-b border-gray-800/60">
             <nav className="w-full h-22 text-white max-w-2xl mx-auto flex items-center justify-between sm:px-0 px-10">
                 <div>
-                    <p className="font-bold text-2xl">{title}</p>
-                    <span className="text-gray-400">{subtitle}</span>
+                    <p className="font-bold sm:text-2xl text-xl">{title}</p>
+                    <span className="text-gray-400 sm:text-base text-sm">{subtitle}</span>
                 </div>
 
                 <div className="flex flex-row gap-4">

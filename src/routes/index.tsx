@@ -9,6 +9,7 @@ import { Login } from "../pages/login";
 import { Register } from "../pages/register";
 import { PrivateRoutes } from "./privateRoutes";
 import { Run } from "../pages/run";
+import { History } from "../pages/history";
 
 
 export const router = createBrowserRouter([
@@ -27,6 +28,12 @@ export const router = createBrowserRouter([
                 path: "/", element:
                     <PrivateRoutes>
                         <Home />
+                    </PrivateRoutes>
+            },
+            {
+                path: "/historico", element:
+                    <PrivateRoutes>
+                        <History />
                     </PrivateRoutes>
             },
             {
