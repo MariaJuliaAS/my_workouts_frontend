@@ -7,9 +7,10 @@ import { FaPlus } from "react-icons/fa";
 export function MainLayout() {
     const { pathname } = useLocation();
     const isNewWorkoutPage = pathname === "/treino/novo";
+    const isWorkoutDetailPage = pathname.startsWith("/treino/") && pathname !== "/treino/novo" && pathname !== "/treino/editar";
 
     function renderHeader() {
-        if (isNewWorkoutPage) {
+        if (isNewWorkoutPage || isWorkoutDetailPage) {
             return null;
         }
 
@@ -48,7 +49,7 @@ export function MainLayout() {
                 <Outlet />
             </main>
 
-            {isNewWorkoutPage ? null : <Nav />}
+            {isNewWorkoutPage || isWorkoutDetailPage ? null : <Nav />}
         </div>
     )
 }

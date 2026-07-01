@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import { MainLayout } from "../layouts/MainLayout";
 import { Home } from "../pages/home";
 import { Workout } from "../pages/workout";
+import { WorkoutDetail } from "../pages/workout_detail";
 import { PRs } from "../pages/pr";
 import { NewWorkout } from "../pages/new_workout";
 import { EditWorkout } from "../pages/edit_workout";
@@ -32,6 +33,12 @@ export const router = createBrowserRouter([
                 path: "treinos", element:
                     <PrivateRoutes>
                         <Workout />
+                    </PrivateRoutes>
+            },
+            {
+                path: "treino/:id", element:
+                    <PrivateRoutes>
+                        <WorkoutDetail />
                     </PrivateRoutes>
             },
             {

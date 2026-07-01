@@ -71,7 +71,11 @@ export function Home() {
                 ) : (
                     <div className="flex items-center flex-col w-full overflow-y-auto gap-4">
                         {workoutList.map((workout) => (
-                            <div key={workout.id} className="w-full bg-neutral-950/70 border hover:border-amber-600/40 border-gray-800/60 cursor-pointer rounded-xl flex items-center justify-between px-4 py-3 group">
+                            <div
+                                key={workout.id}
+                                onClick={() => navigate(`/treino/${workout.id}`)}
+                                className="w-full bg-neutral-950/70 border hover:border-amber-600/40 border-gray-800/60 cursor-pointer rounded-xl flex items-center justify-between px-4 py-3 group"
+                            >
                                 <div className="flex items-center justify-center gap-4">
                                     <div className="text-amber-600 bg-amber-600/30 flex items-center justify-center h-12 w-12 rounded-xl">
                                         <LuDumbbell size={24} />
@@ -86,13 +90,19 @@ export function Home() {
                                         <RiArrowRightSLine size={24} />
                                     </button>
                                     <div className="hidden items-center gap-2 group-hover:flex">
-                                        <button 
-                                            onClick={() => navigate(`/treino/editar/${workout.id}`)}
+                                        <button
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+                                                navigate(`/treino/editar/${workout.id}`)
+                                            }}
                                             className="cursor-pointer transition-all duration-200 hover:scale-105 p-2">
                                             <LuPencil size={20} className="text-gray-400" />
                                         </button>
                                         <button
-                                            onClick={() => handleDeleteWorkout(workout.id)}
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+                                                handleDeleteWorkout(workout.id)
+                                            }}
                                             className="cursor-pointer transition-all duration-200 hover:scale-105 p-2">
                                             <LuTrash size={20} className="text-gray-400" />
                                         </button>
