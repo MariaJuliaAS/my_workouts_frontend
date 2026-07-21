@@ -17,7 +17,7 @@ interface WorkoutDetail {
     exercises: Exercise[]
 }
 
-export function WorkoutDetail() {
+export function WorkoutStart() {
     const { id } = useParams<{ id: string }>()
     const [workout, setWorkout] = useState<WorkoutDetail | null>(null)
     const [loading, setLoading] = useState(true)
@@ -59,6 +59,33 @@ export function WorkoutDetail() {
         )
     }
 
+    const totalSets = workout.exercises.reduce((acc, exercise) => acc + exercise.sets, 0)
+
+    function renderInputExerciseLog(sets: number) {
+        return Array.from({ length: sets }, (_, index) => (
+            <div
+                key={index}
+                className="bg-gray-600/20 rounded-xl flex items-center justify-between px-6 py-3"
+            >
+                <p className="font-semibold">{index + 1}</p>
+
+                <input
+                    className="px-4 py-1 rounded-full border-gray-800 border sm:w-auto w-20"
+                    placeholder="kg"
+                />
+
+                <input
+                    className="px-4 py-1 rounded-full border-gray-800 border sm:w-auto w-20"
+                    placeholder="reps"
+                />
+
+                <button className="w-10 rounded-full border-gray-800 border hover:bg-gray-600/30 cursor-pointer">
+                    ok
+                </button>
+            </div>
+        ))
+    }
+
     return (
         <>
             <header className="w-full h-22 border-b border-gray-800/60 bg-black/50 text-white max-w-2xl mx-auto flex items-center gap-4 sm:px-0 px-10">
@@ -67,7 +94,7 @@ export function WorkoutDetail() {
                 </Link>
                 <div>
                     <p className="font-bold text-2xl">{workout.name}</p>
-                    <span className="text-gray-400 text-sm">{workout.exercises.length} exercício(s)</span>
+                    <span className="text-gray-400 text-sm">{totalSets} Sets</span>
                 </div>
             </header>
 
@@ -79,22 +106,17 @@ export function WorkoutDetail() {
                                 Nenhum exercício cadastrado neste treino
                             </div>
                         ) : (
-                            workout.exercises.map((exercise, index) => (
+                            workout.exercises.map((exercise) => (
                                 <div
                                     key={exercise.id}
                                     className="bg-neutral-950/70 border border-gray-800/60 rounded-xl p-4 flex flex-col gap-3"
                                 >
-                                    <div className="flex items-center gap-4">
-                                        <span className="text-gray-400 text-sm bg-gray-600/20 w-6 h-6 text-center flex items-center justify-center rounded-full">{index + 1}</span>
-                                        <div className="min-w-0">
+                                    <div className="flex justify-center flex-col gap-4">
+                                        <header className="flex items-center gap-2">
+                                            <p className="text-gray-400 text-sm bg-gray-600/20 w-10 h-10 font-medium text-center flex items-center justify-center rounded-full">0/{exercise.sets}</p>
                                             <p className="font-semibold text-lg truncate">{exercise.name}</p>
-                                            <span className="text-gray-400 text-sm">
-                                                {exercise.sets} Séries | {exercise.reps} Repetições
-                                            </span>
-                                            {exercise.notes ? (
-                                                <p className="text-sm text-gray-400">{exercise.notes}</p>
-                                            ) : null}
-                                        </div>
+                                        </header>
+                                        {renderInputExerciseLog(exercise.sets)}
                                     </div>
                                 </div>
                             ))

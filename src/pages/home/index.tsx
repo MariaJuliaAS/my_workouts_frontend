@@ -94,6 +94,7 @@ export function Home() {
                                         <button
                                             onClick={(event) => {
                                                 event.stopPropagation();
+                                                navigate(`/treino/iniciar/${workout.id}`)
                                             }}
                                             className="cursor-pointer transition-all duration-200 hover:scale-105 p-2">
                                             <IoPlayOutline size={24} className="text-gray-400" />
