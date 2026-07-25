@@ -14,8 +14,8 @@ export function MainLayout() {
             return null;
         }
 
-        if (pathname === "/treinos") {
-            return <Header title="Treinar" subtitle="Escolha um treino para iniciar" />;
+        if (pathname === "/historico") {
+            return <Header title="Histórico" subtitle="Veja seus últimos treinos" />;
         }
 
         if (pathname === "/prs") {

@@ -11,6 +11,7 @@ import { PrivateRoutes } from "./privateRoutes";
 import { Run } from "../pages/run";
 import { History } from "../pages/history";
 import { WorkoutStart } from "../pages/workout_start";
+import { HistoryDetail } from "../pages/history_detail/HistoryDetail";
 
 
 export const router = createBrowserRouter([
@@ -35,6 +36,13 @@ export const router = createBrowserRouter([
                 path: "/historico", element:
                     <PrivateRoutes>
                         <History />
+                    </PrivateRoutes>
+            },
+            {
+                path: "historico/:workout_log_id",
+                element:
+                    <PrivateRoutes>
+                        <HistoryDetail />
                     </PrivateRoutes>
             },
             {
