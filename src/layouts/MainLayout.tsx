@@ -18,14 +18,12 @@ export function MainLayout() {
             return <Header title="Histórico" subtitle="Veja seus últimos treinos" />;
         }
 
+        if (pathname === "/corrida") {
+            return <Header title="Corrida" subtitle="Registre suas corridas" />;
+        }
+
         if (pathname === "/prs") {
-            return <Header title="PRs" subtitle="Acompanhe seus recordes pessoais"
-                action={{
-                    to: "/pr/novo",
-                    label: "Novo PR",
-                    icon: <FaPlus className="sm:text-xl text-lg" />,
-                }}
-            />;
+            return <Header title="PRs" subtitle="Acompanhe seus recordes pessoais" />;
         }
 
         return (

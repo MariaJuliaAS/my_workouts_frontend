@@ -1,5 +1,4 @@
 import { createBrowserRouter } from "react-router-dom";
-import { MainLayout } from "../layouts/MainLayout";
 import { Home } from "../pages/home";
 import { WorkoutDetail } from "../pages/workout_detail";
 import { PRs } from "../pages/pr";
@@ -12,6 +11,7 @@ import { Run } from "../pages/run";
 import { History } from "../pages/history";
 import { WorkoutStart } from "../pages/workout_start";
 import { HistoryDetail } from "../pages/history_detail/HistoryDetail";
+import { MainLayout } from "../layouts/MainLayout";
 
 
 export const router = createBrowserRouter([
