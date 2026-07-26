@@ -21,6 +21,7 @@ interface Exercise {
 
 export function Home() {
     const [workoutList, setWorkoutList] = useState<WorkoutProps[]>([])
+    const [loading, setLoading] = useState(true)
     const navigate = useNavigate()
 
     async function fetchWorkouts() {
@@ -29,6 +30,8 @@ export function Home() {
             setWorkoutList(res.data);
         } catch (err: any) {
             console.error(err.response?.data)
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -58,7 +61,11 @@ export function Home() {
             )}
 
             <main className="w-full text-white flex justify-center h-full">
-                {workoutList.length === 0 ? (
+                {loading ? (
+                    <div className="flex items-center justify-center py-16">
+                        <p className="text-gray-400 text-sm">Carregando...</p>
+                    </div>
+                ) : workoutList.length === 0 ? (
                     <div className="flex items-center justify-center flex-col py-10">
                         <LuDumbbell size={58} className="text-gray-400 mb-4" />
                         <p className="font-medium text-lg sm:text-xl">Nenhum treino ainda</p>

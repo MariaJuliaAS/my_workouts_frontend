@@ -219,7 +219,6 @@ export function PRs() {
                             <p className="text-gray-400 text-sm">Carregando...</p>
                         </div>
                     ) : prs.length === 0 ? (
-                        /* Estado vazio */
                         <div className="flex items-center justify-center flex-col py-10">
                             <GoTrophy size={58} className="text-gray-400 mb-4" />
                             <p className="font-medium text-base sm:text-xl">Nenhum PR ainda</p>
