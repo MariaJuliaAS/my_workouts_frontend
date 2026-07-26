@@ -234,7 +234,6 @@ export function PRs() {
                             </button>
                         </div>
                     ) : (
-                        /* Lista de PRs */
                         <div className="flex flex-col w-full gap-3">
                             {prs.map((pr) => (
                                 <div
@@ -258,7 +257,7 @@ export function PRs() {
 
                                     <button
                                         onClick={() => handleDelete(pr.id)}
-                                        className="text-gray-600 hover:text-red-500 transition-colors duration-200 p-2 cursor-pointer opacity-0 group-hover:opacity-100"
+                                        className="text-gray-600 hover:text-red-500 transition-colors duration-200 p-2 cursor-pointer"
                                     >
                                         <LuTrash size={18} />
                                     </button>

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { LuDumbbell, LuPencil, LuTrash } from "react-icons/lu";
-import { RiArrowRightSLine } from "react-icons/ri";
 import { NavLink, useNavigate } from "react-router-dom";
 import { api } from "../../api/api";
 import { IoPlayOutline } from "react-icons/io5";
@@ -87,10 +86,7 @@ export function Home() {
                                     </div>
                                 </div>
                                 <div className="flex items-center">
-                                    <button className="text-gray-400 transition-all duration-150 group-hover:hidden p-2">
-                                        <RiArrowRightSLine size={24} />
-                                    </button>
-                                    <div className="hidden items-center gap-2 group-hover:flex">
+                                    <div className="items-center gap-2">
                                         <button
                                             onClick={(event) => {
                                                 event.stopPropagation();
