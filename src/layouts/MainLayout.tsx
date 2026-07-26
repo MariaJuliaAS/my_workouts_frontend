@@ -8,9 +8,10 @@ export function MainLayout() {
     const { pathname } = useLocation();
     const isNewWorkoutPage = pathname === "/treino/novo";
     const isWorkoutDetailPage = pathname.startsWith("/treino/") && pathname !== "/treino/novo" && pathname !== "/treino/editar";
+    const isHistoryDetailPage = pathname.startsWith("/historico/") && pathname !== "/historico";
 
     function renderHeader() {
-        if (isNewWorkoutPage || isWorkoutDetailPage) {
+        if (isNewWorkoutPage || isWorkoutDetailPage || isHistoryDetailPage) {
             return null;
         }
 
@@ -47,7 +48,7 @@ export function MainLayout() {
                 <Outlet />
             </main>
 
-            {isNewWorkoutPage || isWorkoutDetailPage ? null : <Nav />}
+            {isNewWorkoutPage || isWorkoutDetailPage || isHistoryDetailPage ? null : <Nav />}
         </div>
     )
 }

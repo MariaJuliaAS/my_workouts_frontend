@@ -5,7 +5,6 @@ import { FaArrowLeftLong } from "react-icons/fa6"
 import { LuClock4, LuDumbbell } from "react-icons/lu"
 import { FiCheck } from "react-icons/fi"
 
-// ---------- tipos ----------
 interface ExerciseLog {
     id: string
     set_number: number
@@ -29,14 +28,12 @@ interface WorkoutLogDetail {
     exercises_logs: ExerciseLog[]
 }
 
-// ---------- tipos agrupados ----------
 interface GroupedExercise {
     exerciseId: string
     exerciseName: string
     sets: ExerciseLog[]
 }
 
-// ---------- helpers ----------
 function formatDate(dateStr: string): string {
     return new Date(dateStr).toLocaleDateString("pt-BR", {
         weekday: "long",
@@ -67,7 +64,6 @@ function groupByExercise(logs: ExerciseLog[]): GroupedExercise[] {
     return Array.from(map.values())
 }
 
-// ---------- componente ----------
 export function HistoryDetail() {
     const { workout_log_id } = useParams<{ workout_log_id: string }>()
     const [log, setLog] = useState<WorkoutLogDetail | null>(null)
@@ -111,7 +107,6 @@ export function HistoryDetail() {
 
     return (
         <>
-            {/* Header */}
             <header className="w-full h-22 border-b border-gray-800/60 bg-black/50 text-white max-w-2xl mx-auto flex items-center gap-4 sm:px-0 px-10">
                 <Link to="/historico" className="transition-all duration-200 hover:scale-110">
                     <FaArrowLeftLong size={22} className="text-gray-500 mt-1" />
@@ -124,12 +119,10 @@ export function HistoryDetail() {
                 </div>
             </header>
 
-            {/* Conteúdo */}
             <div className="h-full w-full sm:px-0 px-10 py-5">
                 <main className="w-full text-white flex justify-center h-full">
                     <div className="w-full flex flex-col gap-4">
 
-                        {/* Resumo */}
                         <div className="bg-neutral-950/70 border border-gray-800/60 rounded-xl px-4 py-3 flex items-center gap-6">
                             <div className="flex items-center gap-2 text-gray-400 text-sm">
                                 <LuClock4 size={15} />
@@ -146,7 +139,6 @@ export function HistoryDetail() {
                             </div>
                         </div>
 
-                        {/* Exercícios */}
                         {grouped.length === 0 ? (
                             <div className="border border-dashed border-gray-700 rounded-xl py-8 text-center text-gray-500 text-sm">
                                 Nenhuma série registrada
@@ -157,7 +149,6 @@ export function HistoryDetail() {
                                     key={group.exerciseId}
                                     className="bg-neutral-950/70 border border-gray-800/60 rounded-xl p-4 flex flex-col gap-4"
                                 >
-                                    {/* Cabeçalho do exercício */}
                                     <header className="flex items-center gap-3">
                                         <div className="text-amber-500 bg-amber-600/10 flex items-center justify-center w-10 h-10 rounded-full shrink-0">
                                             <LuDumbbell size={18} />
@@ -168,7 +159,6 @@ export function HistoryDetail() {
                                         </div>
                                     </header>
 
-                                    {/* Cabeçalho da tabela */}
                                     <div className="grid grid-cols-[32px_1fr_1fr_44px] gap-2 px-1">
                                         <span className="text-xs text-gray-600 uppercase tracking-wider text-center">Série</span>
                                         <span className="text-xs text-gray-600 uppercase tracking-wider text-center">Carga</span>
@@ -176,7 +166,6 @@ export function HistoryDetail() {
                                         <span className="text-xs text-gray-600 uppercase tracking-wider text-center">Feito</span>
                                     </div>
 
-                                    {/* Linhas — somente leitura */}
                                     <div className="flex flex-col gap-2">
                                         {group.sets.map((set) => (
                                             <div
