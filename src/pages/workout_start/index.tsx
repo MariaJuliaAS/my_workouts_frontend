@@ -121,7 +121,7 @@ export function WorkoutStart() {
     const [finishing, setFinishing] = useState(false)
 
     const [pendingLog, setPendingLog] = useState<WorkoutLog | null>(null)
-    const [pendingLogs, setPendingLogs] = useState<ExerciseLog[]>([])
+    const [, setPendingLogs] = useState<ExerciseLog[]>([])
     const [showPendingModal, setShowPendingModal] = useState(false)
 
     useEffect(() => {
