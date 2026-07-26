@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { LuDumbbell, LuPencil, LuTrash } from "react-icons/lu";
-import { RiArrowRightSLine } from "react-icons/ri";
 import { NavLink, useNavigate } from "react-router-dom";
 import { api } from "../../api/api";
 import { IoPlayOutline } from "react-icons/io5";
