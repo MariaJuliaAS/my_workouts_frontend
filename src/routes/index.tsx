@@ -1,5 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
-import { Home } from "../pages/home";
+import { Workout } from "../pages/workout";
 import { WorkoutDetail } from "../pages/workout_detail";
 import { PRs } from "../pages/pr";
 import { NewWorkout } from "../pages/new_workout";
@@ -12,6 +12,8 @@ import { History } from "../pages/history";
 import { WorkoutStart } from "../pages/workout_start";
 import { HistoryDetail } from "../pages/history_detail/HistoryDetail";
 import { MainLayout } from "../layouts/MainLayout";
+import { Home } from "../pages/home";
+import { WeeklyPlanner } from "../pages/weekly_planner";
 
 
 export const router = createBrowserRouter([
@@ -27,9 +29,23 @@ export const router = createBrowserRouter([
         element: <MainLayout />,
         children: [
             {
-                path: "/", element:
+                path: "/",
+                element:
                     <PrivateRoutes>
                         <Home />
+                    </PrivateRoutes>
+            },
+            {
+                path: "/planejar-semana",
+                element:
+                    <PrivateRoutes>
+                        <WeeklyPlanner />
+                    </PrivateRoutes>
+            },
+            {
+                path: "/treinos", element:
+                    <PrivateRoutes>
+                        <Workout />
                     </PrivateRoutes>
             },
             {

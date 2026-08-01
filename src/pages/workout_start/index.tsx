@@ -328,7 +328,7 @@ export function WorkoutStart() {
                                                 {exDone}/{es.exercise.sets}
                                             </p>
                                             <div>
-                                                <p className="font-semibold text-lg truncate">{es.exercise.name}</p>
+                                                <p className="font-semibold text-lg">{es.exercise.name}</p>
                                                 <p className="text-gray-500 text-xs">{es.exercise.sets} séries · {es.exercise.reps} reps</p>
                                             </div>
                                         </header>

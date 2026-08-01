@@ -1,33 +1,114 @@
-import { useEffect, useState } from "react";
-import { LuDumbbell, LuPencil, LuTrash } from "react-icons/lu";
-import { NavLink, useNavigate } from "react-router-dom";
-import { api } from "../../api/api";
-import { IoPlayOutline } from "react-icons/io5";
+import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { api } from "../../api/api"
+import { FiChevronRight } from "react-icons/fi"
+import { GoTrophy } from "react-icons/go"
+import { LuFlame, LuClock4 } from "react-icons/lu"
+import { IoMdCheckmarkCircleOutline } from "react-icons/io"
 
-export interface WorkoutProps {
-    id: string;
-    name: string;
-    user_id: string;
-    exercises?: Exercise[];
+interface HomeStats {
+    streak: number
+    weekHours: number
+    lastPr: { exercise_name: string; weight: number; reps: number } | null
 }
 
-interface Exercise {
-    id: number
-    name: string
-    sets: string
-    reps: string
-    notes: string
+interface WeeklyPlan {
+    id: string
+    day_of_week: number
+    note: string | null
+    workout_id: string | null
+    workout: { id: string; name: string } | null
+    type: "REST" | "CARDIO" | "WORKOUT"
+}
+
+interface WorkoutLog {
+    id: string
+    started_at: string
+    completed_at: string | null
+    workouts_id: string
+}
+
+const DAY_LABELS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"]
+
+function getWeekDates(): Date[] {
+    const now = new Date()
+    const dow = now.getDay()
+    const diffToMonday = dow === 0 ? -6 : 1 - dow
+    const monday = new Date(now)
+    monday.setDate(now.getDate() + diffToMonday)
+    monday.setHours(0, 0, 0, 0)
+    return Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(monday)
+        d.setDate(monday.getDate() + i)
+        return d
+    })
+}
+
+function toDateStr(date: Date) {
+    return date.toISOString().slice(0, 10)
+}
+
+function getDayItems(plans: WeeklyPlan[]) {
+    if (plans.length === 0) {
+        return [
+            {
+                title: "Sem planejamento",
+                subtitle: null,
+                isRest: true,
+            },
+        ]
+    }
+
+    return plans.map(plan => {
+        if (plan.type === "REST") {
+            return {
+                title: "Descanso",
+                subtitle: plan.note,
+                isRest: true,
+            }
+        }
+
+        if (plan.type === "CARDIO") {
+            return {
+                title: "Cardio",
+                subtitle: plan.note,
+                isRest: false,
+            }
+        }
+
+        return {
+            title: plan.workout?.name ?? "Treino",
+            subtitle: plan.note,
+            isRest: false,
+        }
+    })
 }
 
 export function Home() {
-    const [workoutList, setWorkoutList] = useState<WorkoutProps[]>([])
-    const [loading, setLoading] = useState(true)
     const navigate = useNavigate()
 
-    async function fetchWorkouts() {
+    const [stats, setStats] = useState<HomeStats | null>(null)
+    const [weeklyPlans, setWeeklyPlans] = useState<WeeklyPlan[]>([])
+    const [weekLogs, setWeekLogs] = useState<WorkoutLog[]>([])
+    const [loading, setLoading] = useState(true)
+
+    const weekDates = getWeekDates()
+    const todayStr = toDateStr(new Date())
+
+    useEffect(() => {
+        fetchAll()
+    }, [])
+
+    async function fetchAll() {
         try {
-            const res = await api.get("/workout")
-            setWorkoutList(res.data);
+            const [statsRes, plansRes, logsRes] = await Promise.all([
+                api.get<HomeStats>("/home/stats"),
+                api.get<WeeklyPlan[]>("/weekly_plan"),
+                api.get<WorkoutLog[]>("/workout_log"),
+            ])
+            setStats(statsRes.data)
+            setWeeklyPlans(plansRes.data)
+            setWeekLogs(logsRes.data)
         } catch (err: any) {
             console.error(err.response?.data)
         } finally {
@@ -35,96 +116,154 @@ export function Home() {
         }
     }
 
-    useEffect(() => {
-        fetchWorkouts();
-    }, [])
-
-    async function handleDeleteWorkout(workoutId: string) {
-        console.log("Deleting workout with ID:", workoutId);
-        try {
-            await api.delete(`/workout/${workoutId}`);
-            setWorkoutList(prevWorkouts => prevWorkouts.filter(workout => workout.id !== workoutId));
-            alert("Treino deletado com sucesso!");
-        } catch (err: any) {
-            console.error(err.response?.data)
-            alert("Erro ao deletar treino. Por favor, tente novamente.");
-        }
+    function getPlansForDate(date: Date): WeeklyPlan[] {
+        return weeklyPlans.filter(p => p.day_of_week === date.getDay())
     }
 
-    return (
-        <div className="h-full w-full  sm:px-0 px-10 py-5">
-            {workoutList.length > 0 && (
-                <header className="text-white flex flex-row justify-between mb-8">
-                    <p className="font-medium text-lg sm:text-xl">Meus treinos</p>
-                    <span className="text-gray-400">{workoutList.length} treino(s)</span>
-                </header>
-            )}
+    function isCompleted(workoutId: string, date: Date): boolean {
+        const dateStr = toDateStr(date)
+        return weekLogs.some(log =>
+            log.workouts_id === workoutId &&
+            log.completed_at !== null &&
+            log.completed_at.slice(0, 10) === dateStr
+        )
+    }
 
-            <main className="w-full text-white flex justify-center h-full">
-                {loading ? (
-                    <div className="flex items-center justify-center py-16">
-                        <p className="text-gray-400 text-sm">Carregando...</p>
+    const isToday = (date: Date) => toDateStr(date) === todayStr
+
+    return (
+        <div className="h-full w-full sm:px-0 px-6 py-5 flex flex-col gap-5">
+
+            {loading ? (
+                <div className="grid grid-cols-2 gap-3">
+                    {[...Array(2)].map((_, i) => (
+                        <div key={i} className="bg-neutral-950/70 border border-gray-800/60 rounded-xl p-4 h-20 animate-pulse" />
+                    ))}
+                </div>
+            ) : (
+                <>
+                    <div className="grid grid-cols-2 gap-3">
+                        <div className="bg-neutral-950/70 border border-gray-800/60 rounded-xl p-4 flex flex-col gap-1">
+                            <div className="flex items-center gap-1.5 text-amber-500">
+                                <LuFlame size={16} />
+                                <span className="text-xs text-gray-400">dias seguidos</span>
+                            </div>
+                            <p className="text-white font-bold text-2xl">{stats?.streak ?? 0}</p>
+                            <p className="text-gray-500 text-xs">sequência atual</p>
+                        </div>
+
+                        <div className="bg-neutral-950/70 border border-gray-800/60 rounded-xl p-4 flex flex-col gap-1">
+                            <div className="flex items-center gap-1.5 text-amber-500">
+                                <LuClock4 size={16} />
+                                <span className="text-xs text-gray-400">esta semana</span>
+                            </div>
+                            <p className="text-white font-bold text-2xl">{stats?.weekHours ?? 0}h</p>
+                            <p className="text-gray-500 text-xs">treinadas</p>
+                        </div>
                     </div>
-                ) : workoutList.length === 0 ? (
-                    <div className="flex items-center justify-center flex-col py-10">
-                        <LuDumbbell size={58} className="text-gray-400 mb-4" />
-                        <p className="font-medium text-lg sm:text-xl">Nenhum treino ainda</p>
-                        <p className="text-gray-400 max-w-68 text-center sm:text-base text-sm">Crie seu primeiro treino e comece a acompanhar seu progresso</p>
-                        <NavLink to="/treino/novo"
-                            className="sm:text-base text-sm bg-amber-600 px-4 h-10 rounded-lg flex items-center text-black cursor-pointer font-semibold mt-6 transition-all duration-200 shadow-lg shadow-amber-600/40 hover:bg-amber-500 hover:scale-105">
-                            Crie seu primeiro treino
-                        </NavLink>
-                    </div>
-                ) : (
-                    <div className="flex items-center flex-col w-full overflow-y-auto gap-4">
-                        {workoutList.map((workout) => (
-                            <div
-                                key={workout.id}
-                                onClick={() => navigate(`/treino/${workout.id}`)}
-                                className="w-full bg-neutral-950/70 border hover:border-amber-600/40 border-gray-800/60 cursor-pointer rounded-xl flex items-center justify-between px-4 py-3 group"
-                            >
-                                <div className="flex items-center justify-center gap-4">
-                                    <div className="text-amber-600 bg-amber-600/30 flex items-center justify-center h-12 w-12 rounded-xl">
-                                        <LuDumbbell size={24} />
-                                    </div>
-                                    <div>
-                                        <p className="font-medium text-lg">{workout.name}</p>
-                                        <span className="text-gray-400">{workout.exercises?.length || 0} Exercícios</span>
-                                    </div>
-                                </div>
-                                <div className="flex items-center">
-                                    <div className="items-center gap-2">
-                                        <button
-                                            onClick={(event) => {
-                                                event.stopPropagation();
-                                                navigate(`/treino/iniciar/${workout.id}`)
-                                            }}
-                                            className="cursor-pointer transition-all duration-200 hover:scale-105 p-2">
-                                            <IoPlayOutline size={24} className="text-gray-400" />
-                                        </button>
-                                        <button
-                                            onClick={(event) => {
-                                                event.stopPropagation();
-                                                navigate(`/treino/editar/${workout.id}`)
-                                            }}
-                                            className="cursor-pointer transition-all duration-200 hover:scale-105 p-2">
-                                            <LuPencil size={20} className="text-gray-400" />
-                                        </button>
-                                        <button
-                                            onClick={(event) => {
-                                                event.stopPropagation();
-                                                handleDeleteWorkout(workout.id)
-                                            }}
-                                            className="cursor-pointer transition-all duration-200 hover:scale-105 p-2">
-                                            <LuTrash size={20} className="text-gray-400" />
-                                        </button>
-                                    </div>
+
+                    {stats?.lastPr && (
+                        <div
+                            onClick={() => navigate("/prs")}
+                            className="bg-amber-600/10 border border-amber-600/30 rounded-xl px-4 py-3 flex items-center justify-between cursor-pointer hover:border-amber-600/60 transition-all duration-200"
+                        >
+                            <div className="flex items-center gap-3">
+                                <GoTrophy size={20} className="text-amber-500 shrink-0" />
+                                <div>
+                                    <p className="text-xs text-amber-500/80 font-medium uppercase tracking-wider">Novo PR</p>
+                                    <p className="text-white font-semibold text-sm">
+                                        {stats.lastPr.exercise_name}: {stats.lastPr.weight}kg × {stats.lastPr.reps} reps
+                                    </p>
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                )}
-            </main>
+                            <FiChevronRight size={18} className="text-amber-600/60" />
+                        </div>
+                    )}
+                </>
+            )}
+
+            <div>
+                <div className="flex items-center justify-between mb-3">
+                    <p className="text-white font-semibold text-base">Visão Semanal</p>
+                    <span className="text-gray-500 text-xs">
+                        {new Date().toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}
+                    </span>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                    {weekDates.map((date, idx) => {
+                        const plans = getPlansForDate(date)
+                        const today = isToday(date)
+                        const dow = date.getDay()
+                        const items = getDayItems(plans)
+
+                        const workoutPlans = plans.filter(p => p.workout_id !== null)
+                        const hasWorkouts = workoutPlans.length > 0
+                        const allDone = hasWorkouts && workoutPlans.every(p =>
+                            isCompleted(p.workout_id!, date)
+                        )
+                        const noPlans = plans.length === 0
+
+                        return (
+                            <div
+                                key={idx}
+                                onClick={() => navigate("/planejar-semana")}
+                                className={`w-full rounded-xl px-4 py-3 flex items-center justify-between cursor-pointer transition-all duration-200 border
+                                    ${today
+                                        ? "bg-amber-600/10 border-amber-600/40"
+                                        : "bg-neutral-950/70 border-gray-800/60 hover:border-gray-700"
+                                    }`}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className={`flex flex-col items-center w-9 shrink-0 ${today ? "text-amber-500" : "text-gray-500"}`}>
+                                        <span className="text-xs font-medium">{DAY_LABELS[dow]}</span>
+                                        <span className="text-base font-bold leading-tight">{date.getDate()}</span>
+                                    </div>
+
+                                    <div className="flex flex-col gap-2">
+                                        {items.map((item, index) => (
+                                            <div key={index} className="flex flex-col">
+                                                <p
+                                                    className={`text-sm font-medium ${noPlans
+                                                        ? "text-gray-600"
+                                                        : item.isRest
+                                                            ? "text-gray-400"
+                                                            : "text-white"
+                                                        }`}
+                                                >
+                                                    {item.title}
+                                                </p>
+
+                                                {item.subtitle && (
+                                                    <p className="text-gray-500 text-xs">
+                                                        {item.subtitle}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="shrink-0">
+                                    {hasWorkouts && allDone ? (
+                                        <span className="text-xs text-green-400 font-medium flex items-center gap-1">
+                                            <IoMdCheckmarkCircleOutline size={20} />
+                                            Concluído
+                                        </span>
+                                    ) : today && hasWorkouts ? (
+                                        <span className="text-xs text-amber-500 font-medium flex items-center gap-1">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 inline-block animate-pulse" />
+                                            Pendente
+                                        </span>
+                                    ) : (
+                                        <FiChevronRight size={16} className="text-gray-700" />
+                                    )}
+                                </div>
+                            </div>
+                        )
+                    })}
+                </div>
+            </div>
         </div>
     )
 }

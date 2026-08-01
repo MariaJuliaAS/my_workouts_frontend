@@ -1,6 +1,7 @@
 import { BiRun } from "react-icons/bi";
 import { GoTrophy } from "react-icons/go";
 import { LuDumbbell, LuHistory } from "react-icons/lu";
+import { MdDashboard } from "react-icons/md";
 import { NavLink } from "react-router-dom";
 
 function itemClass(isActive: boolean) {
@@ -9,9 +10,13 @@ function itemClass(isActive: boolean) {
 
 export function Nav() {
     return (
-        <div className="w-full h-22 border-t border-gray-800/60">
+        <div className="fixed bottom-0 left-0 w-full h-22 border-t border-gray-800/60 bg-black z-50">
             <nav className="w-full h-22  text-white max-w-2xl mx-auto flex items-center justify-between sm:px-0 px-5" >
                 <NavLink to="/" className={({ isActive }) => itemClass(isActive)}>
+                    <MdDashboard size={24} className="" />
+                    <p className="text-sm font-medium">Painel</p>
+                </NavLink>
+                <NavLink to="/treinos" className={({ isActive }) => itemClass(isActive)}>
                     <LuDumbbell size={24} className="" />
                     <p className="text-sm font-medium">Treinos</p>
                 </NavLink>
