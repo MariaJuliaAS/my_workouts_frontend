@@ -14,6 +14,7 @@ interface ExerciseLog {
     exercise: {
         id: string
         name: string
+        notes: string | null
     }
 }
 
@@ -31,6 +32,7 @@ interface WorkoutLogDetail {
 interface GroupedExercise {
     exerciseId: string
     exerciseName: string
+    exerciseNotes: string | null
     sets: ExerciseLog[]
 }
 
@@ -57,7 +59,12 @@ function groupByExercise(logs: ExerciseLog[]): GroupedExercise[] {
     for (const log of logs) {
         const key = log.exercise.id
         if (!map.has(key)) {
-            map.set(key, { exerciseId: key, exerciseName: log.exercise.name, sets: [] })
+            map.set(key, {
+                exerciseId: key,
+                exerciseName: log.exercise.name,
+                exerciseNotes: log.exercise.notes, // adicionado
+                sets: []
+            })
         }
         map.get(key)!.sets.push(log)
     }
@@ -175,15 +182,12 @@ export function HistoryDetail() {
                                                 <span className="text-center font-bold text-base text-white">
                                                     {set.set_number}
                                                 </span>
-
                                                 <div className="bg-neutral-900 border border-gray-800/60 rounded-xl px-3 py-2 text-sm text-center text-gray-300">
                                                     {set.weight} kg
                                                 </div>
-
                                                 <div className="bg-neutral-900 border border-gray-800/60 rounded-xl px-3 py-2 text-sm text-center text-gray-300">
                                                     {set.reps}
                                                 </div>
-
                                                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center
                                                     ${set.completed
                                                         ? "bg-amber-600/20 border border-amber-600/40 text-amber-500"
@@ -195,6 +199,13 @@ export function HistoryDetail() {
                                             </div>
                                         ))}
                                     </div>
+
+                                    {group.exerciseNotes && (
+                                        <div className="bg-neutral-900/60 border border-gray-800/40 rounded-xl px-3 py-2">
+                                            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Observações</p>
+                                            <p className="text-gray-400 text-sm">{group.exerciseNotes}</p>
+                                        </div>
+                                    )}
                                 </div>
                             ))
                         )}

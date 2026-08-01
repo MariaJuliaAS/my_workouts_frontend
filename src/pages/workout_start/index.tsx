@@ -384,6 +384,12 @@ export function WorkoutStart() {
                                                 </div>
                                             ))}
                                         </div>
+                                        {es.exercise.notes && (
+                                            <div className="bg-neutral-900/60 border border-gray-800/40 rounded-xl px-3 py-2">
+                                                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Observações</p>
+                                                <p className="text-gray-400 text-sm">{es.exercise.notes}</p>
+                                            </div>
+                                        )}
                                     </div>
                                 )
                             })

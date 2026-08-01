@@ -55,7 +55,7 @@ export const router = createBrowserRouter([
                     </PrivateRoutes>
             },
             {
-                path: "historico/:workout_log_id",
+                path: "/historico/:workout_log_id",
                 element:
                     <PrivateRoutes>
                         <HistoryDetail />

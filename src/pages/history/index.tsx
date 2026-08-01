@@ -4,7 +4,6 @@ import { api } from "../../api/api"
 import { LuDumbbell } from "react-icons/lu"
 import { RiArrowRightSLine } from "react-icons/ri"
 
-// ---------- tipos ----------
 interface WorkoutLog {
     id: string
     started_at: string
@@ -15,7 +14,6 @@ interface WorkoutLog {
     }
 }
 
-// ---------- helpers ----------
 function formatDate(dateStr: string): string {
     return new Date(dateStr).toLocaleDateString("pt-BR", {
         weekday: "long",
@@ -37,7 +35,6 @@ function formatDuration(started: string, completed: string): string {
 
 type TabType = "em_andamento" | "concluidos"
 
-// ---------- componente ----------
 export function History() {
     const navigate = useNavigate()
     const [logs, setLogs] = useState<WorkoutLog[]>([])
@@ -66,7 +63,6 @@ export function History() {
     return (
         <div className="h-full w-full sm:px-0 px-10 py-5">
 
-            {/* Toggle tabs */}
             <div className="flex bg-neutral-950/70 border border-gray-800/60 rounded-xl p-1 mb-6">
                 <button
                     onClick={() => setActiveTab("concluidos")}
