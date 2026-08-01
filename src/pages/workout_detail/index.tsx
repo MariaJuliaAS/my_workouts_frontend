@@ -62,7 +62,7 @@ export function WorkoutDetail() {
     return (
         <>
             <header className="w-full h-22 border-b border-gray-800/60 bg-black/50 text-white max-w-2xl mx-auto flex items-center gap-4 sm:px-0 px-10">
-                <Link to="/" className="transition-all duration-200 hover:scale-110">
+                <Link to="/treinos" className="transition-all duration-200 hover:scale-110">
                     <FaArrowLeftLong size={22} className="text-gray-500 mt-1" />
                 </Link>
                 <div>
