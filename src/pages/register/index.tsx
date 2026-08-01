@@ -5,6 +5,7 @@ import { api } from "../../api/api";
 
 export function Register() {
     const [form, setForm] = useState({ name: "", username: "", password: "" });
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const token = localStorage.getItem("token_my_workouts");
@@ -15,6 +16,7 @@ export function Register() {
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         try {
+            setLoading(true);
             if (!form.name || !form.username || !form.password) {
                 alert("Preencha todos os campos")
                 return;
@@ -24,8 +26,38 @@ export function Register() {
             alert("Conta criada com sucesso!")
             navigate("/login");
         } catch (err: any) {
-            alert("Erro ao criar conta")
+            const status = err.response?.status;
+
+            switch (status) {
+                case 400:
+                    alert("Preencha os dados corretamente.");
+                    break;
+
+                case 409:
+                    alert("Usuário ja existe.");
+                    break;
+
+                case 429:
+                    alert("Muitas tentativas de login. Tente novamente em alguns minutos.");
+                    break;
+
+                case 500:
+                    alert("Erro interno do servidor. Tente novamente mais tarde.");
+                    break;
+
+                default:
+                    if (!err.response) {
+                        alert("Não foi possível conectar ao servidor.");
+                    } else {
+                        alert("Ocorreu um erro inesperado.");
+                    }
+                    break;
+            }
+
             console.error(err);
+
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -79,9 +111,10 @@ export function Register() {
 
                     <button
                         type="submit"
-                        className="bg-amber-600 h-11 rounded-lg text-black font-semibold mt-2 transition-all duration-200 shadow-lg shadow-amber-600/40 hover:bg-amber-500 hover:scale-[1.02] cursor-pointer"
+                        disabled={loading}
+                        className="bg-amber-600 h-11 rounded-lg text-black font-semibold mt-2 transition-all duration-200 shadow-lg shadow-amber-600/40 hover:bg-amber-500 hover:scale-105 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
                     >
-                        Criar conta
+                        {loading ? "Carregando..." : "Criar conta"}
                     </button>
                 </form>
 

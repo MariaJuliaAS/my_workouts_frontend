@@ -5,6 +5,7 @@ import { api } from "../../api/api";
 
 export function Login() {
     const [form, setForm] = useState({ username: "", password: "" });
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const token = localStorage.getItem("token_my_workouts");
@@ -15,7 +16,7 @@ export function Login() {
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         try {
-
+            setLoading(true);
             if (!form.username || !form.password) {
                 alert("Preencha todos os campos")
                 return;
@@ -29,8 +30,45 @@ export function Login() {
             navigate("/");
 
         } catch (err: any) {
-            alert("Erro ao fazer login")
+            const status = err.response?.status;
+
+            switch (status) {
+                case 400:
+                    alert("Preencha os dados corretamente.");
+                    break;
+
+                case 401:
+                    alert("Usuário ou senha inválidos.");
+                    break;
+
+                case 403:
+                    alert("Sua conta não possui permissão para acessar o sistema.");
+                    break;
+
+                case 404:
+                    alert("Usuário não encontrado.");
+                    break;
+
+                case 429:
+                    alert("Muitas tentativas de login. Tente novamente em alguns minutos.");
+                    break;
+
+                case 500:
+                    alert("Erro interno do servidor. Tente novamente mais tarde.");
+                    break;
+
+                default:
+                    if (!err.response) {
+                        alert("Não foi possível conectar ao servidor.");
+                    } else {
+                        alert("Ocorreu um erro inesperado.");
+                    }
+                    break;
+            }
+
             console.error(err);
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -73,9 +111,10 @@ export function Login() {
 
                     <button
                         type="submit"
-                        className="bg-amber-600 h-11 rounded-lg text-black font-semibold mt-2 transition-all duration-200 shadow-lg shadow-amber-600/40 hover:bg-amber-500 hover:scale-[1.02] cursor-pointer"
+                        disabled={loading}
+                        className="bg-amber-600 h-11 rounded-lg text-black font-semibold mt-2 transition-all duration-200 shadow-lg shadow-amber-600/40 hover:bg-amber-500 hover:scale-105 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
                     >
-                        Entrar
+                        {loading ? "Carregando..." : "Entrar"}
                     </button>
                 </form>
 
