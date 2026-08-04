@@ -226,9 +226,7 @@ export function Home() {
                                                 <p
                                                     className={`text-sm font-medium ${noPlans
                                                         ? "text-gray-600"
-                                                        : item.isRest
-                                                            ? "text-gray-400"
-                                                            : "text-white"
+                                                        : "text-white"
                                                         }`}
                                                 >
                                                     {item.title}

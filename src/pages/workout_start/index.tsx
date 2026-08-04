@@ -40,6 +40,18 @@ interface ExerciseLog {
     completed: boolean
 }
 
+interface PreviousSetLog {
+    exercise_id: string
+    set_number: number
+    weight: number
+    reps: number
+}
+
+interface LastCompletedLog {
+    id: string
+    exercises_logs: PreviousSetLog[]
+}
+
 interface WorkoutLog {
     id: string
     started_at: string
@@ -70,6 +82,16 @@ function buildRowsFromLogs(sets: number, logs: ExerciseLog[], exerciseId: string
     })
 }
 
+function getPreviousSet(
+    previousLogs: PreviousSetLog[],
+    exerciseId: string,
+    setNumber: number
+): PreviousSetLog | undefined {
+    return previousLogs.find(
+        (l) => l.exercise_id === exerciseId && l.set_number === setNumber
+    )
+}
+
 interface PendingModalProps {
     onResume: () => void
     onRestart: () => void
@@ -90,7 +112,6 @@ function PendingModal({ onResume, onRestart }: PendingModalProps) {
                         </p>
                     </div>
                 </div>
-
                 <div className="flex flex-col gap-2">
                     <button
                         onClick={onResume}
@@ -124,6 +145,8 @@ export function WorkoutStart() {
     const [, setPendingLogs] = useState<ExerciseLog[]>([])
     const [showPendingModal, setShowPendingModal] = useState(false)
 
+    const [previousLogs, setPreviousLogs] = useState<PreviousSetLog[]>([])
+
     useEffect(() => {
         init()
     }, [id])
@@ -133,12 +156,17 @@ export function WorkoutStart() {
         try {
             setLoading(true)
 
-            const [workoutRes, pendingRes] = await Promise.all([
+            const [workoutRes, pendingRes, lastCompletedRes] = await Promise.all([
                 api.get<WorkoutDetail>(`/workout/${id}`),
                 api.get<WorkoutLog | null>(`/workout_log/pending/${id}`),
+                api.get<LastCompletedLog | null>(`/workout_log/last-completed/${id}`),
             ])
 
             setWorkout(workoutRes.data)
+
+            if (lastCompletedRes.data) {
+                setPreviousLogs(lastCompletedRes.data.exercises_logs)
+            }
 
             if (pendingRes.data) {
                 const logsRes = await api.get<ExerciseLog[]>(`/exercise_log/${pendingRes.data.id}`)
@@ -152,7 +180,6 @@ export function WorkoutStart() {
                         rows: buildRowsFromLogs(ex.sets, logsRes.data, ex.id),
                     }))
                 )
-
             } else {
                 await startFreshLog(id, workoutRes.data)
             }
@@ -196,14 +223,12 @@ export function WorkoutStart() {
     function updateRow(exIdx: number, rowIdx: number, field: "weight" | "reps", value: string) {
         setExerciseStates((prev) =>
             prev.map((es, i) =>
-                i !== exIdx
-                    ? es
-                    : {
-                        ...es,
-                        rows: es.rows.map((r, j) =>
-                            j !== rowIdx ? r : { ...r, [field]: value }
-                        ),
-                    }
+                i !== exIdx ? es : {
+                    ...es,
+                    rows: es.rows.map((r, j) =>
+                        j !== rowIdx ? r : { ...r, [field]: value }
+                    ),
+                }
             )
         )
     }
@@ -230,14 +255,12 @@ export function WorkoutStart() {
 
             setExerciseStates((prev) =>
                 prev.map((es, i) =>
-                    i !== exIdx
-                        ? es
-                        : {
-                            ...es,
-                            rows: es.rows.map((r, j) =>
-                                j !== rowIdx ? r : { ...r, completed: true }
-                            ),
-                        }
+                    i !== exIdx ? es : {
+                        ...es,
+                        rows: es.rows.map((r, j) =>
+                            j !== rowIdx ? r : { ...r, completed: true }
+                        ),
+                    }
                 )
             )
         } catch (err: any) {
@@ -341,49 +364,68 @@ export function WorkoutStart() {
                                         </div>
 
                                         <div className="flex flex-col gap-2">
-                                            {es.rows.map((row, rowIdx) => (
-                                                <div
-                                                    key={rowIdx}
-                                                    className={`grid grid-cols-[32px_minmax(0,1fr)_minmax(0,1fr)_44px] gap-2 items-center transition-opacity duration-200 ${row.completed ? "opacity-40" : ""}`}
-                                                >
-                                                    <span className="text-center font-bold text-base">
-                                                        {row.set_number}
-                                                    </span>
+                                            {es.rows.map((row, rowIdx) => {
+                                                const prev = getPreviousSet(previousLogs, es.exercise.id, row.set_number)
 
-                                                    <input
-                                                        type="number"
-                                                        inputMode="decimal"
-                                                        placeholder="kg"
-                                                        value={row.weight}
-                                                        disabled={row.completed}
-                                                        onChange={(e) => updateRow(exIdx, rowIdx, "weight", e.target.value)}
-                                                        className="bg-neutral-950/70 border border-gray-800/60 rounded-xl px-3 py-2 text-sm text-center text-gray-300 placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-amber-600 focus:border-transparent disabled:cursor-not-allowed"
-                                                    />
-
-                                                    <input
-                                                        type="number"
-                                                        inputMode="numeric"
-                                                        placeholder="reps"
-                                                        value={row.reps}
-                                                        disabled={row.completed}
-                                                        onChange={(e) => updateRow(exIdx, rowIdx, "reps", e.target.value)}
-                                                        className="bg-neutral-950/70 border border-gray-800/60 rounded-xl px-3 py-2 text-sm text-center text-gray-300 placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-amber-600 focus:border-transparent disabled:cursor-not-allowed"
-                                                    />
-
-                                                    <button
-                                                        onClick={() => completeSet(exIdx, rowIdx)}
-                                                        disabled={row.completed}
-                                                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer
-                                                            ${row.completed
-                                                                ? "bg-amber-600/20 border border-amber-600/40 text-amber-500"
-                                                                : "bg-neutral-950/70 border border-gray-800/60 text-gray-500 hover:border-amber-600/60 hover:text-amber-500"
-                                                            }`}
+                                                return (
+                                                    <div
+                                                        key={rowIdx}
+                                                        className={`grid grid-cols-[32px_minmax(0,1fr)_minmax(0,1fr)_44px] gap-2 items-center transition-opacity duration-200 ${row.completed ? "opacity-40" : ""}`}
                                                     >
-                                                        <FiCheck size={18} strokeWidth={row.completed ? 3 : 2} />
-                                                    </button>
-                                                </div>
-                                            ))}
+                                                        <span className="text-center font-bold text-base">
+                                                            {row.set_number}
+                                                        </span>
+
+                                                        <div className="flex flex-col gap-0.5">
+                                                            {prev && (
+                                                                <span className="text-xs text-amber-600/70 text-center">
+                                                                    Ant: {prev.weight}kg
+                                                                </span>
+                                                            )}
+                                                            <input
+                                                                type="number"
+                                                                inputMode="decimal"
+                                                                placeholder="kg"
+                                                                value={row.weight}
+                                                                disabled={row.completed}
+                                                                onChange={(e) => updateRow(exIdx, rowIdx, "weight", e.target.value)}
+                                                                className="bg-neutral-950/70 border border-gray-800/60 rounded-xl px-3 py-2 text-sm text-center text-gray-300 placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-amber-600 focus:border-transparent disabled:cursor-not-allowed"
+                                                            />
+                                                        </div>
+
+                                                        <div className="flex flex-col gap-0.5">
+                                                            {prev && (
+                                                                <span className="text-xs text-amber-600/70 text-center">
+                                                                    Ant: {prev.reps}
+                                                                </span>
+                                                            )}
+                                                            <input
+                                                                type="number"
+                                                                inputMode="numeric"
+                                                                placeholder="reps"
+                                                                value={row.reps}
+                                                                disabled={row.completed}
+                                                                onChange={(e) => updateRow(exIdx, rowIdx, "reps", e.target.value)}
+                                                                className="bg-neutral-950/70 border border-gray-800/60 rounded-xl px-3 py-2 text-sm text-center text-gray-300 placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-amber-600 focus:border-transparent disabled:cursor-not-allowed"
+                                                            />
+                                                        </div>
+
+                                                        <button
+                                                            onClick={() => completeSet(exIdx, rowIdx)}
+                                                            disabled={row.completed}
+                                                            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer self-end
+                                                                ${row.completed
+                                                                    ? "bg-amber-600/20 border border-amber-600/40 text-amber-500"
+                                                                    : "bg-neutral-950/70 border border-gray-800/60 text-gray-500 hover:border-amber-600/60 hover:text-amber-500"
+                                                                }`}
+                                                        >
+                                                            <FiCheck size={18} strokeWidth={row.completed ? 3 : 2} />
+                                                        </button>
+                                                    </div>
+                                                )
+                                            })}
                                         </div>
+
                                         {es.exercise.notes && (
                                             <div className="bg-neutral-900/60 border border-gray-800/40 rounded-xl px-3 py-2">
                                                 <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Observações</p>
