@@ -292,8 +292,8 @@ export function WorkoutStart() {
 
     if (loading) {
         return (
-            <div className="h-full w-full flex items-center justify-center text-white">
-                <p>Carregando treino...</p>
+            <div className="flex items-center justify-center py-16">
+                <p className="text-gray-400 text-sm">Carregando...</p>
             </div>
         )
     }

@@ -85,11 +85,11 @@ export function Workout() {
                             >
                                 <div className="flex items-center justify-center gap-4">
                                     <div className="text-amber-600 bg-amber-600/30 flex items-center justify-center h-12 w-12 rounded-xl">
-                                        <LuDumbbell size={24} />
+                                        <LuDumbbell className="text-2xl" />
                                     </div>
                                     <div>
-                                        <p className="font-medium text-lg">{workout.name}</p>
-                                        <span className="text-gray-400">{workout.exercises?.length || 0} Exercícios</span>
+                                        <p className="font-medium sm:text-lg text-base">{workout.name}</p>
+                                        <span className="text-gray-400 sm:text-base text-sm">{workout.exercises?.length || 0} Exercícios</span>
                                     </div>
                                 </div>
                                 <div className="flex items-center">
@@ -100,7 +100,7 @@ export function Workout() {
                                                 navigate(`/treino/iniciar/${workout.id}`)
                                             }}
                                             className="cursor-pointer transition-all duration-200 hover:scale-105 p-2">
-                                            <IoPlayOutline size={24} className="text-gray-400" />
+                                            <IoPlayOutline className="text-gray-400 sm:text-2xl text-xl" />
                                         </button>
                                         <button
                                             onClick={(event) => {
@@ -108,7 +108,7 @@ export function Workout() {
                                                 navigate(`/treino/editar/${workout.id}`)
                                             }}
                                             className="cursor-pointer transition-all duration-200 hover:scale-105 p-2">
-                                            <LuPencil size={20} className="text-gray-400" />
+                                            <LuPencil className="text-gray-400 sm:text-2xl text-lg" />
                                         </button>
                                         <button
                                             onClick={(event) => {
@@ -116,7 +116,7 @@ export function Workout() {
                                                 handleDeleteWorkout(workout.id)
                                             }}
                                             className="cursor-pointer transition-all duration-200 hover:scale-105 p-2">
-                                            <LuTrash size={20} className="text-gray-400" />
+                                            <LuTrash className="text-gray-400 sm:text-2xl text-lg" />
                                         </button>
                                     </div>
                                 </div>
