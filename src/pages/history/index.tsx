@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { api } from "../../api/api"
-import { LuDumbbell } from "react-icons/lu"
+import { LuDumbbell, LuTrash } from "react-icons/lu"
 import { RiArrowRightSLine } from "react-icons/ri"
 
 interface WorkoutLog {
@@ -53,6 +53,17 @@ export function History() {
             console.error(err.response?.data)
         } finally {
             setLoading(false)
+        }
+    }
+
+    async function handleDeleteWorkoutLog(workoutLogId: string) {
+        try {
+            await api.delete(`/workout_log/${workoutLogId}`);
+            setLogs((prevLogs) => prevLogs.filter((log) => log.id !== workoutLogId));
+            alert("Log do treino deletado com sucesso!");
+        } catch (err: any) {
+            console.error(err.response?.data)
+            alert("Erro ao deletar log do treino. Por favor, tente novamente.");
         }
     }
 
@@ -137,7 +148,17 @@ export function History() {
                                         </p>
                                     </div>
                                 </div>
-                                <RiArrowRightSLine size={22} className="text-gray-600 group-hover:text-gray-400 transition-colors shrink-0" />
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            handleDeleteWorkoutLog(log.id);
+                                        }}
+                                        className="cursor-pointer transition-all duration-200 hover:scale-105">
+                                        <LuTrash className="text-gray-400 sm:text-xl text-lg" />
+                                    </button>
+                                    <RiArrowRightSLine size={22} className="text-gray-600 group-hover:text-gray-400 transition-colors shrink-0" />
+                                </div>
                             </div>
                         ))}
                     </div>
