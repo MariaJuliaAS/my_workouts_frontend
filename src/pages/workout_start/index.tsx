@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { FaArrowLeftLong } from "react-icons/fa6"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { api } from "../../api/api"
@@ -146,8 +146,13 @@ export function WorkoutStart() {
     const [showPendingModal, setShowPendingModal] = useState(false)
 
     const [previousLogs, setPreviousLogs] = useState<PreviousSetLog[]>([])
+    const initializedWorkoutId = useRef<string | null>(null)
+    const createdWorkoutLogId = useRef<string | null>(null)
 
     useEffect(() => {
+        if (!id || initializedWorkoutId.current === id) return
+
+        initializedWorkoutId.current = id
         init()
     }, [id])
 
@@ -194,6 +199,7 @@ export function WorkoutStart() {
 
     async function startFreshLog(workout_id: string, workoutData: WorkoutDetail) {
         const logRes = await api.post<{ id: string }>(`/workout_log/start/${workout_id}`)
+        createdWorkoutLogId.current = logRes.data.id
         setWorkoutLogId(logRes.data.id)
         setExerciseStates(
             workoutData.exercises.map((ex) => ({
@@ -218,6 +224,24 @@ export function WorkoutStart() {
             console.error(err.response?.data)
             alert("Erro ao iniciar novo treino")
         }
+    }
+
+    async function handleBack() {
+        const hasFilledFields = exerciseStates.some((exerciseState) =>
+            exerciseState.rows.some((row) => row.weight.trim() || row.reps.trim())
+        )
+
+        if (createdWorkoutLogId.current && !hasFilledFields) {
+            try {
+                await api.delete(`/workout_log/${createdWorkoutLogId.current}`)
+            } catch (err: any) {
+                console.error(err.response?.data)
+                alert("Erro ao remover o treino vazio.")
+                return
+            }
+        }
+
+        navigate("/")
     }
 
     function updateRow(exIdx: number, rowIdx: number, field: "weight" | "reps", value: string) {
@@ -314,7 +338,14 @@ export function WorkoutStart() {
 
             <header className="w-full h-22 border-b border-gray-800/60 bg-black/50 text-white max-w-2xl mx-auto flex items-center justify-between gap-4 sm:px-0 px-10">
                 <div className="flex items-center gap-4">
-                    <Link to="/" className="transition-all duration-200 hover:scale-110">
+                    <Link
+                        to="/"
+                        onClick={(event) => {
+                            event.preventDefault()
+                            void handleBack()
+                        }}
+                        className="transition-all duration-200 hover:scale-110"
+                    >
                         <FaArrowLeftLong size={22} className="text-gray-500 mt-1" />
                     </Link>
                     <div>
