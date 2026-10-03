@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import { FaArrowLeftLong } from "react-icons/fa6"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { api } from "../../api/api"
-import { LuClock4 } from "react-icons/lu"
+import { LuClock4, LuPencil } from "react-icons/lu"
 import { FiCheck, FiAlertTriangle } from "react-icons/fi"
 
 interface Exercise {
@@ -20,6 +20,7 @@ interface WorkoutDetail {
 }
 
 interface SetRow {
+    id?: string
     set_number: number
     weight: string
     reps: string
@@ -74,6 +75,7 @@ function buildRowsFromLogs(sets: number, logs: ExerciseLog[], exerciseId: string
             (l) => l.exercise_id === exerciseId && l.set_number === i + 1
         )
         return {
+            id: savedLog?.id,
             set_number: i + 1,
             weight: savedLog ? String(savedLog.weight) : "",
             reps: savedLog ? String(savedLog.reps) : "",
@@ -269,20 +271,42 @@ export function WorkoutStart() {
         }
 
         try {
-            await api.post("/exercise_log", {
+            const request = {
                 workout_logs_id: workoutLogId,
                 exercise_id: exercise.id,
                 set_number: row.set_number,
                 weight: parseFloat(row.weight),
                 reps: parseInt(row.reps),
-            })
+            }
+
+            if (row.completed) {
+                setExerciseStates((prev) =>
+                    prev.map((es, i) =>
+                        i !== exIdx ? es : {
+                            ...es,
+                            rows: es.rows.map((r, j) =>
+                                j !== rowIdx ? r : { ...r, completed: false }
+                            ),
+                        }
+                    )
+                )
+                return
+            }
+
+            const logRes = row.id
+                ? await api.put<ExerciseLog>(`/exercise_log/${row.id}`, request)
+                : await api.post<ExerciseLog>("/exercise_log", request)
 
             setExerciseStates((prev) =>
                 prev.map((es, i) =>
                     i !== exIdx ? es : {
                         ...es,
                         rows: es.rows.map((r, j) =>
-                            j !== rowIdx ? r : { ...r, completed: true }
+                            j !== rowIdx ? r : {
+                                ...r,
+                                id: logRes.data.id,
+                                completed: true,
+                            }
                         ),
                     }
                 )
@@ -443,14 +467,16 @@ export function WorkoutStart() {
 
                                                         <button
                                                             onClick={() => completeSet(exIdx, rowIdx)}
-                                                            disabled={row.completed}
                                                             className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer self-end
                                                                 ${row.completed
-                                                                    ? "bg-amber-600/20 border border-amber-600/40 text-amber-500"
+                                                                    ? "bg-amber-600/20 border border-amber-600/40 text-amber-500 hover:border-amber-400 hover:text-amber-400"
                                                                     : "bg-neutral-950/70 border border-gray-800/60 text-gray-500 hover:border-amber-600/60 hover:text-amber-500"
                                                                 }`}
                                                         >
-                                                            <FiCheck size={18} strokeWidth={row.completed ? 3 : 2} />
+                                                            {row.completed
+                                                                ? <LuPencil size={18} />
+                                                                : <FiCheck size={18} strokeWidth={2} />
+                                                            }
                                                         </button>
                                                     </div>
                                                 )
