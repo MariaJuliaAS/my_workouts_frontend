@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { LuMinus, LuPlus, LuX } from "react-icons/lu"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 
@@ -19,19 +19,27 @@ export function WorkoutRest() {
     const restState = (location.state as RestLocationState | null) ?? {}
     const [totalSeconds, setTotalSeconds] = useState(DEFAULT_REST_SECONDS)
     const [remainingSeconds, setRemainingSeconds] = useState(DEFAULT_REST_SECONDS)
+    const endsAt = useRef(Date.now() + DEFAULT_REST_SECONDS * 1000)
 
     useEffect(() => {
-        if (remainingSeconds <= 0) {
-            returnToWorkout()
-            return
+        function updateRemainingTime() {
+            const nextRemainingSeconds = Math.max(
+                Math.ceil((endsAt.current - Date.now()) / 1000),
+                0
+            )
+
+            setRemainingSeconds(nextRemainingSeconds)
+
+            if (nextRemainingSeconds === 0) {
+                returnToWorkout()
+            }
         }
 
-        const timer = window.setInterval(() => {
-            setRemainingSeconds((current) => Math.max(current - 1, 0))
-        }, 1000)
+        updateRemainingTime()
+        const timer = window.setInterval(updateRemainingTime, 1000)
 
         return () => window.clearInterval(timer)
-    }, [remainingSeconds, navigate])
+    }, [navigate])
 
     function returnToWorkout() {
         if (!id) {
@@ -46,11 +54,16 @@ export function WorkoutRest() {
     }
 
     function adjustTime(amount: number) {
-        setRemainingSeconds((current) => {
-            const nextValue = Math.max(current + amount, 0)
-            setTotalSeconds((currentTotal) => Math.max(currentTotal, nextValue))
-            return nextValue
-        })
+        const nextEndTime = Math.max(endsAt.current + amount * 1000, Date.now())
+        const nextValue = Math.ceil((nextEndTime - Date.now()) / 1000)
+
+        endsAt.current = nextEndTime
+        setRemainingSeconds(nextValue)
+        setTotalSeconds((currentTotal) => Math.max(currentTotal, nextValue))
+
+        if (nextValue === 0) {
+            returnToWorkout()
+        }
     }
 
     function formatTime(seconds: number) {
