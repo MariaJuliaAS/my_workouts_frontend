@@ -4,6 +4,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { api } from "../../api/api";
 import { IoPlayOutline } from "react-icons/io5";
 import { BiExport } from "react-icons/bi";
+import { workoutToText, downloadTextFile } from "../../util/workoutToText";
 
 export interface WorkoutProps {
     id: string;
@@ -52,6 +53,32 @@ export function Workout() {
         }
     }
 
+    async function handleExportWorkout(workout: WorkoutProps) {
+        try {
+            let fullWorkout = workout;
+            if (!workout.exercises) {
+                const res = await api.get(`/workout/${workout.id}`);
+                fullWorkout = res.data;
+            }
+
+            const text = workoutToText(fullWorkout);
+            const safeName = fullWorkout.name.replace(/[^\w\s-]/g, "").trim().replace(/\s+/g, "_");
+            const filename = `${safeName || "treino"}.txt`;
+
+            if (navigator.share) {
+                await navigator.share({ title: fullWorkout.name, text });
+            } else {
+                downloadTextFile(text, filename);
+            }
+        } catch (err: any) {
+            // Usuário fechou a janela de compartilhamento: não é erro
+            if (err?.name === "AbortError") return;
+
+            console.error(err.response?.data ?? err);
+            alert("Erro ao exportar treino. Por favor, tente novamente.");
+        }
+    }
+
     return (
         <div className="h-full w-full  sm:px-0 px-10 py-5">
             {workoutList.length > 0 && (
@@ -91,6 +118,10 @@ export function Workout() {
                                         </div>
                                         <div className="flex gap-4">
                                             <button
+                                                onClick={(event) => {
+                                                    event.stopPropagation();
+                                                    handleExportWorkout(workout);
+                                                }}
                                                 className="cursor-pointer transition-all duration-200 hover:scale-105">
                                                 <BiExport className="text-orange-200 sm:text-2xl text-lg" />
                                             </button>
