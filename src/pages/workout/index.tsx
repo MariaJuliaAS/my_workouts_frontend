@@ -3,6 +3,7 @@ import { LuDumbbell, LuPencil, LuTrash } from "react-icons/lu";
 import { NavLink, useNavigate } from "react-router-dom";
 import { api } from "../../api/api";
 import { IoPlayOutline } from "react-icons/io5";
+import { BiExport } from "react-icons/bi";
 
 export interface WorkoutProps {
     id: string;
@@ -81,44 +82,53 @@ export function Workout() {
                             <div
                                 key={workout.id}
                                 onClick={() => navigate(`/treino/${workout.id}`)}
-                                className="w-full bg-neutral-950/70 border hover:border-amber-600/40 border-gray-800/60 cursor-pointer rounded-xl flex items-center justify-between px-4 py-3 group"
+                                className="w-full bg-neutral-950/70 border hover:border-amber-600/40 border-gray-800/60 cursor-pointer rounded-xl flex flex-col gap-2 px-4 py-3 group"
                             >
-                                <div className="flex items-center justify-center gap-4">
-                                    <div className="text-amber-600 bg-amber-600/30 flex items-center justify-center h-12 w-12 rounded-xl">
-                                        <LuDumbbell className="text-2xl" />
-                                    </div>
-                                    <div>
-                                        <p className="font-medium sm:text-lg text-base">{workout.name}</p>
-                                        <span className="text-gray-400 sm:text-base text-sm">{workout.exercises?.length || 0} Exercícios</span>
+                                <div className="flex items-center gap-4">
+                                    <div className="flex flex-row w-full justify-between">
+                                        <div className="text-amber-600 bg-amber-600/30 flex items-center justify-center h-12 w-12 rounded-xl">
+                                            <LuDumbbell className="text-2xl" />
+                                        </div>
+                                        <div className="flex gap-4">
+                                            <button
+                                                className="cursor-pointer transition-all duration-200 hover:scale-105">
+                                                <BiExport className="text-orange-200 sm:text-2xl text-lg" />
+                                            </button>
+                                            <button
+                                                onClick={(event) => {
+                                                    event.stopPropagation();
+                                                    navigate(`/treino/editar/${workout.id}`)
+                                                }}
+                                                className="cursor-pointer transition-all duration-200 hover:scale-105">
+                                                <LuPencil className="text-orange-200 sm:text-2xl text-lg" />
+                                            </button>
+                                            <button
+                                                onClick={(event) => {
+                                                    event.stopPropagation();
+                                                    handleDeleteWorkout(workout.id)
+                                                }}
+                                                className="cursor-pointer transition-all duration-200 hover:scale-105">
+                                                <LuTrash className="text-orange-200 sm:text-2xl text-lg" />
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
+
+                                <div>
+                                    <p className="font-medium sm:text-lg text-base">{workout.name}</p>
+                                    <span className="text-gray-400 sm:text-base text-sm">{workout.exercises?.length || 0} Exercícios</span>
+                                </div>
+
                                 <div className="flex items-center">
-                                    <div className="items-center gap-2">
-                                        <button
-                                            onClick={(event) => {
-                                                event.stopPropagation();
-                                                navigate(`/treino/iniciar/${workout.id}`)
-                                            }}
-                                            className="cursor-pointer transition-all duration-200 hover:scale-105 p-2">
-                                            <IoPlayOutline className="text-gray-400 sm:text-2xl text-xl" />
-                                        </button>
-                                        <button
-                                            onClick={(event) => {
-                                                event.stopPropagation();
-                                                navigate(`/treino/editar/${workout.id}`)
-                                            }}
-                                            className="cursor-pointer transition-all duration-200 hover:scale-105 p-2">
-                                            <LuPencil className="text-gray-400 sm:text-2xl text-lg" />
-                                        </button>
-                                        <button
-                                            onClick={(event) => {
-                                                event.stopPropagation();
-                                                handleDeleteWorkout(workout.id)
-                                            }}
-                                            className="cursor-pointer transition-all duration-200 hover:scale-105 p-2">
-                                            <LuTrash className="text-gray-400 sm:text-2xl text-lg" />
-                                        </button>
-                                    </div>
+                                    <button
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            navigate(`/treino/iniciar/${workout.id}`)
+                                        }}
+                                        className="cursor-pointer transition-all duration-200 hover:scale-105 p-2 bg-amber-600 hover:bg-amber-500 shadow-lg shadow-amber-600/40 text-black flex items-center justify-center w-full rounded-lg font-me">
+                                        <IoPlayOutline className="sm:text-2xl text-xl" />
+                                        Iniciar Treino
+                                    </button>
                                 </div>
                             </div>
                         ))}
