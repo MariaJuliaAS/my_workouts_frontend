@@ -1,4 +1,3 @@
-import { BiRun } from "react-icons/bi";
 import { GoTrophy } from "react-icons/go";
 import { LuDumbbell, LuHistory } from "react-icons/lu";
 import { MdDashboard } from "react-icons/md";
@@ -23,10 +22,6 @@ export function Nav() {
                 <NavLink to="/historico" className={({ isActive }) => itemClass(isActive)}>
                     <LuHistory size={24} className="" />
                     <p className="text-sm font-medium">Histórico</p>
-                </NavLink>
-                <NavLink to="/corrida" className={({ isActive }) => itemClass(isActive)}>
-                    <BiRun size={24} className="" />
-                    <p className="text-sm font-medium">Corrida</p>
                 </NavLink>
                 <NavLink to="/prs" className={({ isActive }) => itemClass(isActive)}>
                     <GoTrophy size={24} className="" />
