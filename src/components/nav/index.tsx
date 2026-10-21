@@ -10,10 +10,7 @@ function itemClass(isActive: boolean) {
 
 export function Nav() {
     return (
-        <div
-            className="fixed inset-x-0 bottom-0 z-50 w-full border-t border-gray-800/60 bg-black"
-            style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-        >
+        <div className="fixed inset-x-0 bottom-0 z-50 w-full border-t border-gray-800/60 bg-black">
             <nav className="w-full h-22 text-white max-w-2xl mx-auto flex items-center justify-between sm:px-0 px-5">
                 <NavLink to="/" className={({ isActive }) => itemClass(isActive)}>
                     <MdDashboard size={24} className="" />
