@@ -63,7 +63,7 @@ export function WorkoutRest() {
     const progressAngle = `${Math.round(progress * 360)}deg`
 
     return (
-        <div className="h-[100dvh] w-full overflow-hidden bg-black text-white flex items-center justify-center px-4 py-4">
+        <div className="h-dvh w-full overflow-hidden bg-black text-white flex items-center justify-center px-4 py-4">
             <main className="w-full max-w-sm h-full min-h-0 flex flex-col px-4 py-4">
                 <header className="flex items-center justify-between">
                     <button
