@@ -10,8 +10,11 @@ function itemClass(isActive: boolean) {
 
 export function Nav() {
     return (
-        <div className="fixed bottom-0 left-0 w-full h-22 border-t border-gray-800/60 bg-black z-50">
-            <nav className="w-full h-22  text-white max-w-2xl mx-auto flex items-center justify-between sm:px-0 px-5" >
+        <div
+            className="fixed inset-x-0 bottom-0 z-50 w-full border-t border-gray-800/60 bg-black"
+            style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+        >
+            <nav className="w-full h-22 text-white max-w-2xl mx-auto flex items-center justify-between sm:px-0 px-5">
                 <NavLink to="/" className={({ isActive }) => itemClass(isActive)}>
                     <MdDashboard size={24} className="" />
                     <p className="text-sm font-medium">Painel</p>
