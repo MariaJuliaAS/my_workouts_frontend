@@ -156,7 +156,7 @@ export function Workout() {
                                             event.stopPropagation();
                                             navigate(`/treino/iniciar/${workout.id}`)
                                         }}
-                                        className="cursor-pointer transition-all duration-200 hover:scale-105 p-2 bg-amber-600 hover:bg-amber-500 shadow-lg shadow-amber-600/40 text-black flex items-center justify-center w-full rounded-lg font-me">
+                                        className="cursor-pointer transition-all duration-200 hover:scale-102 p-2 bg-amber-600 hover:bg-amber-500 shadow-lg shadow-amber-600/40 text-black flex items-center justify-center w-full rounded-lg font-me">
                                         <IoPlayOutline className="sm:text-2xl text-xl" />
                                         Iniciar Treino
                                     </button>

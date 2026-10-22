@@ -14,7 +14,6 @@ import { HistoryDetail } from "../pages/history_detail/HistoryDetail";
 import { MainLayout } from "../layouts/MainLayout";
 import { Home } from "../pages/home";
 import { WeeklyPlanner } from "../pages/weekly_planner";
-import { WorkoutRest } from "../pages/workout_rest";
 
 
 export const router = createBrowserRouter([
@@ -25,13 +24,6 @@ export const router = createBrowserRouter([
     {
         element: <Register />,
         path: "/cadastro"
-    },
-    {
-        path: "treino/iniciar/:id/descanso",
-        element:
-            <PrivateRoutes>
-                <WorkoutRest />
-            </PrivateRoutes>
     },
     {
         element: <MainLayout />,

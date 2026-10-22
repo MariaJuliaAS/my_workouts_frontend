@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { FaArrowLeftLong } from "react-icons/fa6"
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import { api } from "../../api/api"
 import { LuClock4, LuPencil } from "react-icons/lu"
 import { FiCheck, FiAlertTriangle } from "react-icons/fi"
@@ -136,10 +136,6 @@ function PendingModal({ onResume, onRestart }: PendingModalProps) {
 export function WorkoutStart() {
     const { id } = useParams<{ id: string }>()
     const navigate = useNavigate()
-    const location = useLocation()
-    const shouldResumeWorkout = Boolean(
-        (location.state as { resumeWorkout?: boolean } | null)?.resumeWorkout
-    )
 
     const [workout, setWorkout] = useState<WorkoutDetail | null>(null)
     const [workoutLogId, setWorkoutLogId] = useState<string | null>(null)
@@ -152,7 +148,6 @@ export function WorkoutStart() {
     const [showPendingModal, setShowPendingModal] = useState(false)
 
     const [previousLogs, setPreviousLogs] = useState<PreviousSetLog[]>([])
-    const [editingSets, setEditingSets] = useState<Set<string>>(new Set())
     const initializedWorkoutId = useRef<string | null>(null)
     const createdWorkoutLogId = useRef<string | null>(null)
 
@@ -184,10 +179,7 @@ export function WorkoutStart() {
                 const logsRes = await api.get<ExerciseLog[]>(`/exercise_log/${pendingRes.data.id}`)
                 setPendingLog(pendingRes.data)
                 setPendingLogs(logsRes.data)
-                setShowPendingModal(!shouldResumeWorkout)
-                if (shouldResumeWorkout) {
-                    setWorkoutLogId(pendingRes.data.id)
-                }
+                setShowPendingModal(true)
 
                 setExerciseStates(
                     workoutRes.data.exercises.map((ex) => ({
@@ -272,7 +264,6 @@ export function WorkoutStart() {
 
         const { exercise, rows } = exerciseStates[exIdx]
         const row = rows[rowIdx]
-        const editingKey = `${exercise.id}-${row.set_number}`
 
         if (!row.weight || !row.reps) {
             alert("Preencha o peso e as repetições antes de marcar como feito.")
@@ -289,7 +280,6 @@ export function WorkoutStart() {
             }
 
             if (row.completed) {
-                setEditingSets((prev) => new Set(prev).add(editingKey))
                 setExerciseStates((prev) =>
                     prev.map((es, i) =>
                         i !== exIdx ? es : {
@@ -303,7 +293,6 @@ export function WorkoutStart() {
                 return
             }
 
-            const wasEditing = editingSets.has(editingKey)
             const logRes = row.id
                 ? await api.put<ExerciseLog>(`/exercise_log/${row.id}`, request)
                 : await api.post<ExerciseLog>("/exercise_log", request)
@@ -322,38 +311,6 @@ export function WorkoutStart() {
                     }
                 )
             )
-
-            if (wasEditing) {
-                setEditingSets((prev) => {
-                    const next = new Set(prev)
-                    next.delete(editingKey)
-                    return next
-                })
-                return
-            }
-
-            const currentExerciseRows = exerciseStates[exIdx].rows
-            const nextRow = currentExerciseRows
-                .slice(rowIdx + 1)
-                .find((setRow) => !setRow.completed)
-            const nextExerciseState = nextRow
-                ? exerciseStates[exIdx]
-                : exerciseStates.slice(exIdx + 1).find((exerciseState) =>
-                    exerciseState.rows.some((setRow) => !setRow.completed)
-                )
-            const upcomingRow = nextRow ?? nextExerciseState?.rows.find((setRow) => !setRow.completed)
-
-            navigate(`/treino/iniciar/${id}/descanso`, {
-                state: upcomingRow && nextExerciseState
-                    ? {
-                        nextExercise: nextExerciseState.exercise.name,
-                        nextSet: upcomingRow.set_number,
-                        nextTotalSets: nextExerciseState.exercise.sets,
-                        nextWeight: upcomingRow.weight,
-                        nextReps: upcomingRow.reps,
-                    }
-                    : undefined,
-            })
         } catch (err: any) {
             console.error(err.response?.data)
             alert("Erro ao salvar a série.")
